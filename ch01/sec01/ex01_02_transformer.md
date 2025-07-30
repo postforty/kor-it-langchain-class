@@ -1,4 +1,4 @@
-### **1. 보완된 트랜스포머 구조 (Residual, LayerNorm, Feed Forward 포함)**
+## **1. 보완된 트랜스포머 구조 (Residual, LayerNorm, Feed Forward 포함)**
 
 ```mermaid
 graph TB
@@ -65,7 +65,7 @@ graph TB
 
 ---
 
-### **2. 트랜스포머와 기존 아키텍처의 주요 차이점**
+## **2. 트랜스포머와 기존 아키텍처의 주요 차이점**
 
 **2.1. 처리 방식의 근본적 차이**
 
