@@ -1,4 +1,4 @@
-## **1. 보완된 트랜스포머 구조 (Residual, LayerNorm, Feed Forward 포함)**
+## **1. 트랜스포머 구조 (Residual, LayerNorm, Feed Forward 포함)**
 
 ```mermaid
 graph TB
