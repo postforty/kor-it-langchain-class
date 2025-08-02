@@ -109,6 +109,16 @@
   uv python list
   ```
 
+- 설치된 파이썬을 삭제한다.
+
+  ```bash
+  # 특정 파이썬 버전 삭제
+  uv python uninstall 3.12
+
+  # uv가 관리하는 모든 파이썬 버전 삭제 (주의: 시스템의 다른 파이썬 설치는 삭제하지 않음)
+  uv python uninstall --all
+  ```
+
 ### 3-2. UV를 이용한 Python 스크립트 실행
 
 - 예시를 위한 `example.py` 파일 내용은 다음과 같다.
