@@ -16,7 +16,7 @@
 - [소개](#introduction)
 - [pyenv](#pyenv)
 - [pyenv-win 명령어](#pyenv-win-commands)
-- [설치](#설치)
+- [설치](#installation)
 - [설치 유효성 검사](#validate-installation)
 - [사용법](#usage)
 - [pyenv 업데이트 방법](#how-to-update-pyenv)
@@ -91,15 +91,15 @@ whence       List all Python versions that contain the given executable
 
 현재 다음 방법들을 지원하니, 편한 방법을 선택하십시오:
 
-- [PowerShell](./installation.md#powershell) - 가장 쉬운 방법
-- [Git 명령어](./installation.md#git-commands) - 기본 방법 + 수동 설정 추가
-- [Pyenv-win zip](./installation.md#pyenv-win-zip) - 수동 설치
-- [Python pip](./installation.md#python-pip) - 기존 사용자용
-- [Chocolatey](./installation.md#chocolatey)
-- [32비트 트레인 사용 방법](./installation.md#how-to-use-32-train)
+- [PowerShell](docs/installation.md#powershell) - 가장 쉬운 방법
+- [Git 명령어](docs/installation.md#git-commands) - 기본 방법 + 수동 설정 추가
+- [Pyenv-win zip](docs/installation.md#pyenv-win-zip) - 수동 설치
+- [Python pip](docs/installation.md#python-pip) - 기존 사용자용
+- [Chocolatey](docs/installation.md#chocolatey)
+- [32비트 트레인 사용 방법](docs/installation.md#how-to-use-32-train)
   - [공지사항 확인](#announcements)
 
-자세한 내용은 [설치](./installation.md) 페이지를 참조하십시오.
+자세한 내용은 [설치](./docs/installation.md) 페이지를 참조하십시오.
 
 ## 설치 유효성 검사
 
@@ -210,11 +210,11 @@ This PC
 
 ## 자주 묻는 질문
 
-[자주 묻는 질문](./faq.md) 페이지를 참조하십시오.
+[자주 묻는 질문](./docs/faq.md) 페이지를 참조하십시오.
 
 ## 변경 로그
 
-[변경 로그](./changelog.md) 페이지를 참조하십시오.
+[변경 로그](./docs/changelog.md) 페이지를 참조하십시오.
 
 ## 기여 방법
 
