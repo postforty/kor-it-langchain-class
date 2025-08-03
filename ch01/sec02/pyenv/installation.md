@@ -10,9 +10,9 @@
 - [Python pip](#python-pip) - 기존 사용자용
 - [Chocolatey](#chocolatey)
 - [32비트 트레인 사용 방법](#how-to-use-32-train)
-  - [공지사항 확인](../pyenv.md#announcements)
+  - [공지사항 확인](./pyenv_win.md#announcements)
 
-만세! 완료되면 다음 단계는 [설치 유효성 검사](../pyenv.md#validate-installation)입니다.
+만세! 완료되면 다음 단계는 [설치 유효성 검사](./pyenv_win.md#validate-installation)입니다.
 
 _참고:_ Windows 10 1905 또는 최신 버전을 실행 중인 경우, 시작 > "앱 실행 별칭 관리"에서 내장 파이썬 런처를 비활성화하고 파이썬에 대한 "앱 설치 관리자" 별칭을 꺼야 할 수도 있습니다.
 
@@ -42,7 +42,7 @@ At line:1 char:173
 
 설치가 완료되었습니다!
 
-[pyenv로 돌아가기](../pyenv.md#installation)
+[pyenv로 돌아가기](./pyenv_win.md#installation)
 
 ---
 
@@ -60,7 +60,7 @@ _참고:_ 위에 언급된 링크를 확인하는 것을 잊지 마십시오. �
 
 설치가 완료되었습니다!
 
-[pyenv로 돌아가기](../pyenv.md#installation)
+[pyenv로 돌아가기](./pyenv_win.md#installation)
 
 ---
 
@@ -84,7 +84,7 @@ _참고:_ 위에 언급된 링크를 확인하는 것을 잊지 마십시오. �
 
 설치가 완료되었습니다!
 
-[pyenv로 돌아가기](../pyenv.md#installation)
+[pyenv로 돌아가기](./pyenv_win.md#installation)
 
 ---
 
@@ -110,7 +110,7 @@ _참고:_ 위에 언급된 링크를 확인하는 것을 잊지 마십시오. �
 
 그러면 설치가 완료될 것입니다!
 
-[pyenv로 돌아가기](../pyenv.md#installation)
+[pyenv로 돌아가기](./pyenv_win.md#installation)
 
 ---
 
@@ -126,7 +126,7 @@ Chocolatey 페이지: [pyenv-win](https://chocolatey.org/packages/pyenv-win)
 
 설치 유효성 검사
 
-[pyenv로 돌아가기](../pyenv.md#installation)
+[pyenv로 돌아가기](./pyenv_win.md#installation)
 
 ---
 
@@ -166,7 +166,7 @@ C:\Users\my_pc\.pyenv\pyenv-win\shims
 ```
 
 설치가 완료되었습니다. 만세!
-[pyenv로 돌아가기](../pyenv.md#installation)
+[pyenv로 돌아가기](./pyenv_win.md#installation)
 
 ## **Git BASH 사용법**
 
@@ -196,4 +196,4 @@ echo 'export PATH="$HOME/.pyenv/pyenv-win/bin:$PATH"' >> ~/.bash_profile
   2. [Pyenv-win zip](#pyenv-win-zip)의 2단계 따르기
   3. [시스템 설정 추가](#add-system-settings) 단계
 
-[pyenv로 돌아가기](../pyenv.md#installation)
+[pyenv로 돌아가기](./pyenv_win.md#installation)
