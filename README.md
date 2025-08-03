@@ -24,6 +24,7 @@
 
 1. Do it! LLM을 활용한 AI 에이전트 개발 입문
 2. 러닝 랭체인: 랭체인과 랭그래프로 구현하는 RAG, 에이전트, 인지 아키텍처
+3. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
 
 ## 2. 커리큘럼
 
