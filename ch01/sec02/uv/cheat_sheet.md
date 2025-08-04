@@ -226,3 +226,8 @@
   ```bash
   uv run --with jupyter jupyter lab --allow-root --ip=0.0.0.0 --port=8888 --NotebookApp.token=''
   ```
+
+### 5-2. VS Code에서 UV 가상 환경의 Jupyter Notebook 사용 시 고려사항
+
+- `uv`로 관리되는 가상 환경에서 Jupyter Notebook을 사용할 경우, VS Code에서 Jupyter 커널 선택 시 `.venv`와 같은 해당 가상 환경을 선택해야 정상적으로 동작한다.
+- 가상 환경에서 Jupyter Notebook 관련 의존성(예: `ipykernel`)을 설치할 때는 `pip` 대신 `uv add` 명령어를 사용한다. 예를 들어, `uv add ipykernel`과 같이 사용한다.
