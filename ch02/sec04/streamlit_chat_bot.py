@@ -18,15 +18,14 @@ load_dotenv()
 
 print("채팅할 때마다 모든 코드가 다시 실행됨!")
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-client = genai.Client(api_key=gemini_api_key)
+gemini_api_key = os.getenv("GEMINI_API_KEY") # 환경 변수 설정
+client = genai.Client(api_key=gemini_api_key) # 모델 객체 생성
 
 st.write("Mark1 🤖")
 
 st.caption(
     "streamlit, gemini-2.5-flash를 사용하였습니다.")
 
-# Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "assistant", "content": "안녕하세요, 저는 Mark1입니다."}]
@@ -35,31 +34,27 @@ if "messages" not in st.session_state:
 if "chat" not in st.session_state:
     st.session_state.chat = client.chats.create(model="gemini-2.5-flash")
 
-# Display chat messages from history on app rerun
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Accept user input
 if prompt := st.chat_input("What is up?"):
-    # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    response = st.session_state.chat.send_message(prompt)
+    response = st.session_state.chat.send_message(prompt) # 메시지 전송
 
-   # Display assistant response in chat message container
-    with st.chat_message("assistant"):
+    # 응답 표시
+    with st.chat_message("assistant"): 
         st.markdown(response.text)
 
-    # Add assistant response to chat history
+    # 대화 내용 저장
     st.session_state.messages.append(
         {"role": "assistant", "content": response.text})
 
 print(st.session_state.messages)  # streamlit이 대화 내용 저장하고 있음
 
 # 실행 방법
-# streamlit run 07_streamlit_basic.py
+# streamlit run streamlit_chat_bot.py
