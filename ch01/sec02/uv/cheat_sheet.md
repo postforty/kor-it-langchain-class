@@ -64,6 +64,18 @@
   uv init example
   ```
 
+- 가상 환경 생성
+
+```bash
+# .venv 폴더가 생성됨(VSCode에서 해상 커널 선택)
+uv venv
+```
+
+```bash
+# 가상 환경 해제 명령어
+deactivate
+```
+
 - 초기화된 프로젝트 환경을 완전히 제거하려면, `uv init` 명령어로 생성된 파일을 삭제하고 필요한 경우 `uv cache clean` 명령어로 캐시를 정리한다.
 
   ```bash

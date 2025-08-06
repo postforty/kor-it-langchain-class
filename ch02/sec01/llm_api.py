@@ -1,11 +1,11 @@
 
 # 환경변수
 # .env 파일은 gitignore에 추가해야 함
-# pip install python-dotenv
+# uv add python-dotenv
 # https://pypi.org/project/python-dotenv/
 
 # gemini API
-# pip install -q -U google-genai
+# uv add google-genai
 # https://ai.google.dev/gemini-api/docs/quickstart?hl=ko
 
 from google import genai

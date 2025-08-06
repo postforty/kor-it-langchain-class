@@ -8,12 +8,12 @@
 
 import streamlit as st
 
-# LLM API
-from google import genai
+# LLM API 
+from google import genai # uv add google-genai
 
 # 환경 변수
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # uv add python-dotenv
 load_dotenv()
 
 print("채팅할 때마다 모든 코드가 다시 실행됨!")
