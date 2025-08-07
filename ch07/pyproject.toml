@@ -12,4 +12,5 @@ dependencies = [
     "langchain-google-genai>=2.1.9",
     "python-dotenv>=1.1.1",
     "tzdata>=2025.2",
+    "yfinance>=0.2.65",
 ]

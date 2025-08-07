@@ -18,3 +18,8 @@ uv add python-dotenv
 # - zoneinfo은 시간대 정보를 위해 tzdata 패키지에 의존함
 uv add tzdata
 ```
+
+```bash
+# yfinance: 야후 파이낸스 API를 사용하여 주식 데이터를 조회하는 데 사용
+uv add yfinance
+```
