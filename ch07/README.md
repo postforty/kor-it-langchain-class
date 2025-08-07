@@ -6,9 +6,15 @@
 # jupyter notebook
 uv add jupyter jupyterlab ipykernel
 
-# langchain-google-genai
-uv add langchain-google-genai
+# langchain & langchain-google-genai
+uv add langchain langchain-google-genai
 
 # python-dotenv
 uv add python-dotenv
+```
+
+```bash
+# ZoneInfoNotFoundError 발생시 설치
+# - zoneinfo은 시간대 정보를 위해 tzdata 패키지에 의존함
+uv add tzdata
 ```
