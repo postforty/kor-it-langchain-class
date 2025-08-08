@@ -23,3 +23,11 @@ uv add tzdata
 # yfinance: 야후 파이낸스 API를 사용하여 주식 데이터를 조회하는 데 사용
 uv add yfinance
 ```
+
+```bash
+# Streamlit
+uv add streamlit
+
+# tabulate: pandas 라이브러리의 to_markdown() 함수가 데이터를 표 형식으로 변환하기 위해 필요
+uv add tabulate
+```
