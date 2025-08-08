@@ -24,3 +24,5 @@ uv add PyMuPDF pypdf langchain langchain_community
 ```bash
 uv add faiss-cpu
 ```
+
+<https://github.com/TeeDDub/learning-langchain/blob/main/python/ch03/04-06.basic-rag-answer.py>
