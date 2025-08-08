@@ -18,7 +18,7 @@
 
 - **개발 OS**: Windows 10 이상
 - **개발 도구(IDE)**: Visual Studio Code, Jupyter Notebook, Google Colab
-- **기타(프레임워크)**: LangChain, LangGraph, LangSmith, Ollama, Streamlit
+- **기타(프레임워크)**: LangChain, LangGraph, LangSmith, Ollama, Streamlit, Github, Docker
 
 ### 참고
 
@@ -89,9 +89,17 @@
 
 ### 5일차: 챗봇에게 지식 주기 RAG로 정보 검색 능력! (4시간)
 
+#### Section 05-01
+
 - 챗봇에게 책 읽히기: 데이터 준비!
 - 임베딩: 텍스트를 숫자로 변환하여 인공지능이 이해하는 언어로 바꾸는 마법 배우기
+
+#### Section 05-02
+
 - 문서 분할(청킹): 긴 문서를 챗봇이 읽기 좋은 작은 조각으로 나누는 방법 배우기
+
+#### Section 05-01
+
 - 벡터 저장소(Vector Store): 챗봇이 정보를 저장하고 빠르게 찾아볼 수 있는 특별한 도서관 만들기
 
 ### 6일차: 챗봇이 지식으로 답변하게 하기! (4시간)
