@@ -7,8 +7,6 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.tools import tool
 from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-import yfinance as yf
-from pydantic import BaseModel, Field
 
 import os
 from dotenv import load_dotenv
@@ -23,6 +21,8 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash", google_api_key=gemini_api_key)
 
 # 도구 함수 정의
+
+
 @tool
 def get_current_time(timezone: str, location: str) -> str:
     """ 현재 시각을 반환하는 함수
@@ -39,23 +39,10 @@ def get_current_time(timezone: str, location: str) -> str:
         return location_and_local_time
     except ZoneInfoNotFoundError:
         return f"알 수 없는 타임존: {timezone}"
-    
-class StockHistoryInput(BaseModel):
-    ticker: str = Field(..., title="주식 코드", description="주식 코드 (예: AAPL)")
-    period: str = Field(..., title="기간", description="주식 데이터 조회 기간 (예: 1d, 1mo, 1y)")
-
-@tool
-def get_yf_stock_history(stock_history_input: StockHistoryInput) -> str:
-    """ 주식 종목의 가격 데이터를 조회하는 함수"""
-    stock = yf.Ticker(stock_history_input.ticker)
-    history = stock.history(period=stock_history_input.period)
-    history_md = history.to_markdown() 
-
-    return history_md
 
 
 # 도구 바인딩
-tools = [get_current_time, get_yf_stock_history]
+tools = [get_current_time]
 
 # 에이전트 프롬프트 정의
 prompt = ChatPromptTemplate.from_messages([
@@ -65,10 +52,8 @@ prompt = ChatPromptTemplate.from_messages([
     MessagesPlaceholder("agent_scratchpad"),
 ])
 
-# 에이전트 생성
+# 에이전트 생성 및 실행기 초기화
 agent = create_tool_calling_agent(llm, tools, prompt)
-
-# AgentExecutor 초기화
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 # 사용자의 메시지 처리하기 위한 함수
@@ -94,9 +79,7 @@ def get_ai_response(messages):
                     tool_output_message = f"**도구 출력:** `{step.observation}`\n"
                     yield tool_output_message
     
-    # 스트리밍이 완료된 후, 최종 응답을 session_state에 추가
-    # 이 부분은 st.chat_message("assistant").write_stream(response)에서 처리하므로 중복될 수 있습니다.
-    # 하지만 gathered를 사용하여 최종 메시지를 구성하는 기존 로직과 유사하게 유지합니다.
+    # 스트리밍 완료 후 최종 응답 저장
     st.session_state.messages.append(AIMessage(full_response))
 
 
@@ -131,10 +114,7 @@ if prompt := st.chat_input():
     response = get_ai_response(st.session_state["messages"])
 
     result = st.chat_message("assistant").write_stream(response)  # AI 메시지 출력
-    st.session_state["messages"].append(AIMessage(result))  # AI 메시지 저장
-
 
 # 질문 예시:
 # 부산은 지금 몇시야?
 # 테슬라는 한달 전에 비해 주가가 올랐나 내렸나?
-
