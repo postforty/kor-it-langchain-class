@@ -20,11 +20,12 @@
 - **개발 도구(IDE)**: Visual Studio Code, Jupyter Notebook, Google Colab
 - **기타(프레임워크)**: LangChain, LangGraph, LangSmith, Ollama, Streamlit
 
-### 참고 교재
+### 참고
 
 1. Do it! LLM을 활용한 AI 에이전트 개발 입문
 2. 러닝 랭체인: 랭체인과 랭그래프로 구현하는 RAG, 에이전트, 인지 아키텍처
 3. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
+4. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
 
 ## 2. 커리큘럼
 
@@ -103,7 +104,7 @@
 
 #### Section 07-01
 
-- 챗봇을 위한 계산기와 검색 능력 만들기
+- 챗봇을 위한 시계와 주가 검색 능력 만들기
 - 펑션 콜링(Function Calling)으로 챗봇이 외부 도구를 사용하는 방법 배우기
 
 #### Section 07-02
