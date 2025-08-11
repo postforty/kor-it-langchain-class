@@ -92,7 +92,7 @@
 
 #### Section 05-01
 
-- 챗봇이 정보를 찾아보고 답변하는 과정 배우기 (RAG: Retrieval-Augmented Generation)
+- 챗봇이 정보를 찾아보고 답변하는 과정 배우기 (Retrieval Augmented Generation, RAG)
 - 챗봇에게 책 읽히기! (Document Loader)
 
 #### Section 05-02
