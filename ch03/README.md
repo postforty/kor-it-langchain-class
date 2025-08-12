@@ -11,4 +11,7 @@ uv add langchain-google-genai
 
 # python-dotenv
 uv add python-dotenv
+
+# langchain
+uv pip install langchain
 ```
