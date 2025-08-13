@@ -24,8 +24,10 @@
 
 1. Do it! LLM을 활용한 AI 에이전트 개발 입문
 2. 러닝 랭체인: 랭체인과 랭그래프로 구현하는 RAG, 에이전트, 인지 아키텍처
-3. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
-4. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
+3. 테디노트의 랭체인을 활용한 RAG 비법노트(기본편)
+4. 테디노트의 랭체인을 활용한 RAG 비법노트: 심화편
+5. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
+6. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
 
 ---
 
@@ -195,3 +197,49 @@
 
 - 배운 모든 기술을 활용하여 나만의 독창적인 LLM 챗봇 서비스를 직접 기획하고 만들어보기
 - 프로젝트 발표: 자신이 만든 챗봇을 소개하고 다른 사람들과 공유하기
+
+---
+
+## 3. 빠른 시작
+
+- **요구 사항**
+
+  - Windows 10 이상, Git, PowerShell 환경이 필요하다.
+  - Python 3.13 이상이 권장된다. Python 설치/버전 관리는 uv로 진행하면 된다(자세한 사용법은 [`ch01\\sec02\\uv\\cheat_sheet.md`](ch01/sec02/uv/cheat_sheet.md) 참고).
+
+- **uv 설치**
+  - PowerShell에서 다음 명령으로 설치하면 된다.
+
+```powershell
+powershell -ExecutionPolicy Bypass -NoProfile -Command "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+- **Python 설치/버전 관리(uv)**
+  - 각 챕터의 `pyproject.toml`에 `requires-python = ">=3.13"`가 설정되어 있으므로 `uv sync` 시 자동으로 적합한 버전을 사용한다.
+  - 수동 설치 또는 확인 예시:
+
+```powershell
+uv python install 3.13
+uv run python --version
+```
+
+- **레포 클론 및 .env 준비**
+  - 저장소를 클론하고 루트 위치에 `.env` 파일을 만든다.
+
+```env
+GEMINI_API_KEY=여기에_본인_API_키
+```
+
+- **설치/실행 기본 원칙**
+  - 각 챕터 디렉터리로 이동한 뒤 `uv sync`로 의존성을 설치하고, `uv run ...`으로 실행하면 된다.
+
+---
+
+## 4. 자주 묻는 질문(FAQ)
+
+- **키 관련 오류가 발생한다.**
+
+  - `.env`에 `GEMINI_API_KEY`가 설정되어 있는지 확인하면 된다.
+
+- **패키지 설치 오류가 발생한다.**
+  - 관리자 권한 PowerShell로 `uv sync`를 다시 실행하거나, 네트워크 프록시/방화벽을 점검하면 된다.
