@@ -389,6 +389,25 @@ except Exception as e:
     print(f"유효성 검사 오류: {e}")
 ```
 
+**Pydantic Field 유효성 검사 매개변수**:
+
+- `gt` (greater than): 지정된 값보다 큰 값
+- `ge` (greater than or equal): 지정된 값보다 크거나 같은 값  
+- `lt` (less than): 지정된 값보다 작은 값
+- `le` (less than or equal): 지정된 값보다 작거나 같은 값
+- `min_length`: 문자열이나 리스트의 최소 길이
+- `max_length`: 문자열이나 리스트의 최대 길이
+- `regex`: 정규 표현식 패턴 매칭
+
+```python
+# 추가 유효성 검사 예시
+class Product(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    price: float = Field(..., gt=0, le=1000000)
+    quantity: int = Field(..., ge=0)
+    email: str = Field(..., regex=r'^[^@]+@[^@]+\.[^@]+$')
+```
+
 **LangChain/LangGraph와의 연관성**:
 
 - **핵심**: LangChain에서 도구(Tool)의 입력 매개변수와 출력 형식을 Pydantic 모델로 정의하여 LLM이 도구를 정확하게 이해하고 호출할 수 있도록 돕는다. 이는 LLM의 환각(hallucination)을 줄이고 안정적인 도구 사용을 가능하게 한다.
