@@ -6,6 +6,8 @@
 # jupyter notebook
 uv add jupyter jupyterlab ipykernel
 
+uv add docling
+
 uv add langchain langchain-google-genai langchain_community
 
 uv add python-dotenv
