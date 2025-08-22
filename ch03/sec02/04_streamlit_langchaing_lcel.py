@@ -1,3 +1,5 @@
+# 랭체인과 LCEL 적용한 예제
+# 메모리 기능 없음
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
 from langchain_core.prompts import ChatPromptTemplate  # 추가
@@ -16,7 +18,6 @@ if "messages" not in st.session_state:
 
 with st.sidebar:  # 추가
     clear_btn = st.button("초기화")
-
 
 def print_messages():
     for chat_message in st.session_state["messages"]:

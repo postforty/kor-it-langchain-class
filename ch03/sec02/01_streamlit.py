@@ -1,3 +1,5 @@
+# user, assistant 동일 대화 출력
+# 실행 명령: streamlit run 01_streamlit.py
 import streamlit as st
 
 st.title("나만의 챗봇 만들기")

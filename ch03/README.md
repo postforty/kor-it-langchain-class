@@ -3,15 +3,16 @@
 > 원문: <https://python.langchain.com/docs/integrations/providers/google/>
 
 ```bash
-# jupyter notebook
+# 스트림릿
+uv add streamlit
+
+# 주피터 노트북
 uv add jupyter jupyterlab ipykernel
 
-# langchain-google-genai
+# 랭체인
+uv add langchain
 uv add langchain-google-genai
 
-# python-dotenv
+# 환경변수
 uv add python-dotenv
-
-# langchain
-uv pip install langchain
 ```

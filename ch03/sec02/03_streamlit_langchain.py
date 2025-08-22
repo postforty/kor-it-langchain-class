@@ -1,3 +1,5 @@
+# 랭체인 적용
+# user, assistant 모두 동일 대화 출력
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage  # 추가
 

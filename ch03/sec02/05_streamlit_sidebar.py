@@ -54,6 +54,7 @@ def create_chain():
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash", google_api_key=gemini_api_key)
+    
     output_parsers = StrOutputParser()
 
     chain = prompt | llm | output_parsers
