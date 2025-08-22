@@ -11,13 +11,14 @@ MODEL_ID = "gemini-2.5-flash"
 
 
 def summarize_txt(file_path: str):
+    # Gemini API와 통신하기 위한 클라이언트 객체 생성
     client = genai.Client(api_key=gemini_api_key)
 
+    # 로컬에 있는 텍스트 파일을 Gemini API의 서버에 업로드 후 파일의 위치를 가리키는 참조 객체 반환
     file_ref = client.files.upload(file=file_path)
 
     system_prompt = f'''
     이 글을 읽고, 저자의 문제 인식과 주장을 파악하고, 주요 내용을 요약하라.
-
     작성해야 하는 포맷은 다음과 같다.
 
     # 제목

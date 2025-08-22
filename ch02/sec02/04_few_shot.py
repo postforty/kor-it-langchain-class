@@ -32,3 +32,6 @@ print('----')
 
 # Gemini API의 응답에서 텍스트 내용을 추출한다.
 print(response.text)
+
+# Anthropic 프롬프트 엔지니어링 참고
+# https://docs.anthropic.com/ko/docs/build-with-claude/prompt-engineering/overview

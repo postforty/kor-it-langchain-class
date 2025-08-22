@@ -28,6 +28,7 @@
 4. 테디노트의 랭체인을 활용한 RAG 비법노트: 심화편
 5. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
 6. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
+7. Anthropic 프롬프트 엔지니어링: <https://docs.anthropic.com/ko/docs/build-with-claude/prompt-engineering/overview>
 
 ---
 

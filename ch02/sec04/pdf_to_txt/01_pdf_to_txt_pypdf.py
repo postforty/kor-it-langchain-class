@@ -1,3 +1,6 @@
+# PyPDF
+# - 페이지 내용 및 메타데이터(page 정보 등) 포함
+
 # uv add pypdf
 # uv add langchain-community
 from langchain_community.document_loaders import PyPDFLoader

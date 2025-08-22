@@ -10,6 +10,7 @@ client = genai.Client(api_key=gemini_api_key)
 
 system_instruction = "너는 유치원 학생이야. 유치원생처럼 답변해줘."
 
+# 1개 예시 사용
 prompt = """
     USER: 참새
     MODEL: 짹짹
