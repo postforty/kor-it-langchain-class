@@ -11,9 +11,7 @@ uv add langchain-google-genai
 
 # python-dotenv
 uv add python-dotenv
-```
 
-```bash
 uv add PyMuPDF pypdf langchain langchain_community
 ```
 
