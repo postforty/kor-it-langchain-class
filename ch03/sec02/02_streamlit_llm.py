@@ -14,7 +14,7 @@ if "chat_session" not in st.session_state:
     st.session_state.chat_session = client.chats.create(
         model="gemini-2.5-flash")  # 새로운 채팅 세션을 생성 (대화의 연속성 유지)
 
-st.title("나만의 챗봇 만들기")
+st.title("나만의 LLM 챗봇 만들기")
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = []  # 채팅 기록을 저장할 리스트를 초기화

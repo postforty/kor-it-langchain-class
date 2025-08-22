@@ -3,7 +3,7 @@
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage  # 추가
 
-st.title("나만의 챗봇 만들기")
+st.title("나만의 LangChain 챗봇 만들기")
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
