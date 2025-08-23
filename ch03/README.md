@@ -1,4 +1,4 @@
-### 랭체인 구글 제미나이 의존성 설치
+### 의존성 설치
 
 > 원문: <https://python.langchain.com/docs/integrations/providers/google/>
 

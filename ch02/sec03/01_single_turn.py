@@ -1,3 +1,6 @@
+# turn == 대화
+# single-turn: 대화 내용을 기억하지 않음
+
 from google import genai
 from google.genai import types
 import os
