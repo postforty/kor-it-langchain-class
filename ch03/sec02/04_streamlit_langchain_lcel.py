@@ -55,8 +55,11 @@ user_input = st.chat_input("궁금한 내용을 물어보세요!")
 
 if user_input:  # 수정
     st.chat_message("user").write(user_input)
+    add_message("user", user_input) # st.session_state.messages에 사용자 입력값 추가
+    
     chain = create_chain()
-    response = chain.stream({"question": user_input})
+    # response = chain.stream({"question": user_input}) # 질문만 넘김
+    response = chain.stream({"question": st.session_state.messages}) # 모든 대화 리스트를 넘김
 
     with st.chat_message("assistant"):
         container = st.empty()
@@ -67,7 +70,6 @@ if user_input:  # 수정
             ai_answer += token
             container.markdown(ai_answer)
 
-    add_message("user", user_input)
     add_message("assistant", ai_answer)
 
 print(st.session_state["messages"])

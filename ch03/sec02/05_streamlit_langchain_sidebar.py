@@ -71,8 +71,10 @@ user_input = st.chat_input("궁금한 내용을 물어보세요!")
 
 if user_input:
     st.chat_message("user").write(user_input)
+    add_message("user", user_input)
+    
     chain = create_chain()
-    response = chain.stream({"question": user_input})
+    response = chain.stream({"question": st.session_state.messages})
 
     with st.chat_message("assistant"):
         container = st.empty()

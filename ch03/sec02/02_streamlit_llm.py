@@ -59,3 +59,5 @@ if user_input:
     # AI 채팅 메시지를 시각적으로 출력하는 기능
     with st.chat_message("assistant"):
         st.write(response_text)
+
+print("st.session_state:", st.session_state)
