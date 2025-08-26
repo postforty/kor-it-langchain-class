@@ -250,4 +250,8 @@ GEMINI_API_KEY=여기에_본인_API_키
   - `.env`에 `GEMINI_API_KEY`가 설정되어 있는지 확인하면 된다.
 
 - **패키지 설치 오류가 발생한다.**
+
   - 관리자 권한 PowerShell로 `uv sync`를 다시 실행하거나, 네트워크 프록시/방화벽을 점검하면 된다.
+
+- **import 코드에 노란줄이 생긴다.**
+  - 모듈을 설치했음에도 불구하고 노란줄이 생기는 경우에는 단축키 `ctrl + shift + p` 입력 후, `Python: Restart Language Server`를 검색 후 실행하면 된다.
