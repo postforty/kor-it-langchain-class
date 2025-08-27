@@ -1,3 +1,4 @@
+
 from pyexpat import model
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
@@ -7,11 +8,11 @@ from langchain_teddynote.prompts import load_prompt
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_ollama import ChatOllama
-from dotenv import load_dotenv
-import os
 from retriever import create_retriever
 
-# API KEY 정보로드
+import os
+from dotenv import load_dotenv
+
 load_dotenv()
 
 # 프로젝트 이름을 입력합니다.
