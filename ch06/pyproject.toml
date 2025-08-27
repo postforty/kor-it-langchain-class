@@ -15,4 +15,5 @@ dependencies = [
     "pymupdf>=1.26.3",
     "pypdf>=5.9.0",
     "python-dotenv>=1.1.1",
+    "streamlit>=1.49.0",
 ]
