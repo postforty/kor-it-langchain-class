@@ -16,6 +16,8 @@ uv add faiss-cpu
 uv add streamlit
 
 uv add pdfplumber
+
+uv add langchain-ollama
 ```
 
 ### 랭체인 구글 제미나이 임베딩
