@@ -12,6 +12,7 @@ dependencies = [
     "langchain>=0.3.27",
     "langchain-community>=0.3.27",
     "langchain-google-genai>=2.1.9",
+    "pdfplumber>=0.11.7",
     "pymupdf>=1.26.3",
     "pypdf>=5.9.0",
     "python-dotenv>=1.1.1",

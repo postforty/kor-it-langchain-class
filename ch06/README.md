@@ -14,6 +14,8 @@ uv add PyMuPDF pypdf langchain langchain_community
 uv add faiss-cpu
 
 uv add streamlit
+
+uv add pdfplumber
 ```
 
 ### 랭체인 구글 제미나이 임베딩

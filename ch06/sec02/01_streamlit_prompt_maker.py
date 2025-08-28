@@ -1,9 +1,8 @@
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, load_prompt
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import load_prompt
 # from langchain import hub
 import glob
 
@@ -96,9 +95,7 @@ if user_input:
 print("st.session_state.messages:", st.session_state.messages)
 
 
-'''
-[테스트]
-프롬프트를 선택해 주세요: prompt-maker.yaml 선택
-TASK 입력: 블러그 글 작성
-입력 프롬프트: 대한민국이라는 주제로 글을 작성해 주세요
-'''
+# 테스트
+# 프롬프트를 선택해 주세요: prompt-maker.yaml 선택
+# TASK 입력: 블러그 글 작성
+# 입력 프롬프트: 대한민국이라는 주제로 글을 작성해 주세요
