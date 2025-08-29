@@ -72,6 +72,10 @@ docker run --name pgvector-container -e POSTGRES_USER=langchain -e POSTGRES_PASS
 | :----------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
 | `-v C:/docker-postgresql/postgresql_data:/var/lib/postgresql/data` | C:/docker-postgresql/postgresql_data를 컨테이너 내부의 PostgreSQL 데이터 디렉터리에 연결하여 데이터베이스 파일이 로컬에 저장함 |
 
+```bash
+docker inspect pgvector-container # 컨테이너 볼륨 확인(Mounts 섹션 검색)
+```
+
 ---
 
 ### 3. 유용한 도커 명령어

@@ -18,6 +18,8 @@ uv add streamlit
 uv add pdfplumber
 
 uv add langchain-ollama
+
+uv add langchain_postgres
 ```
 
 ### 랭체인 구글 제미나이 임베딩
