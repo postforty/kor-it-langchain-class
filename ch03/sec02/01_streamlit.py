@@ -1,3 +1,4 @@
+# 공식 문서: https://streamlit.io/playground?example=llm_chat
 # user, assistant 동일 대화 출력
 # 실행 명령: uv run streamlit run 01_streamlit.py
 import streamlit as st
@@ -16,7 +17,7 @@ if user_input:
     #   st.write(f"사용자 입력: {user_input}")
 
     #   아바타 추가
-    #   대화를 입력할때마다 새로고침됨
+    #   대화를 입력할 때마다 새로고침됨
     st.chat_message("user").write(user_input)
     st.chat_message("assistant").write(user_input)
 
