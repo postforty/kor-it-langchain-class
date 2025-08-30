@@ -1,3 +1,4 @@
+# 셀렉트 모드 변경시 즉시 언어가 반영되도록 개선함
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -88,6 +89,8 @@ if user_input:
             ai_answer += token
             container.markdown(ai_answer)
 
+    # 이 부분이 대화 내용에 추가되는 부분입니다.
+    # 이전 대화 기록이 남아있도록 하려면 주석 처리하거나 제거하지 않아야 합니다.
     add_message("user", user_input)
     add_message("assistant", ai_answer)
 
