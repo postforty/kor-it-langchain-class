@@ -1,3 +1,4 @@
+# 셀렉트 모드 변경시 즉시 언어가 반영되도록 개선함
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -50,7 +51,7 @@ def create_chain():
     if selected_prompt == "English":
         prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "You are a friendly AI assistant who answers in English."),
+                ("system", "You are a friendly AI assistant who answers in English. Please make sure to answer English questions in English."),
                 ("user", "#Question:\n{question}"),
             ]
         )
@@ -88,6 +89,7 @@ if user_input:
             ai_answer += token
             container.markdown(ai_answer)
 
+    # 대화 내용에 추가되는 부분
     add_message("user", user_input)
     add_message("assistant", ai_answer)
 
