@@ -1,0 +1,29 @@
+services:
+  n8n:
+    image: n8nio/n8n
+    restart: always
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - n8n_ollama_net
+
+  ollama:
+    image: ollama/ollama
+    restart: always
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - n8n_ollama_net
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+
+networks:
+  n8n_ollama_net:
+    driver: bridge
+
+volumes:
+  n8n_data:
