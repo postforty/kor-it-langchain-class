@@ -18,3 +18,7 @@ uv add langchain-ollama
 ### 랭체인 구글 제미나이 임베딩
 
 > 원문: <https://python.langchain.com/docs/integrations/text_embedding/google_generative_ai/>
+
+### Google API 연동 방법
+
+> 참고 문서: <https://wikidocs.net/290921>
