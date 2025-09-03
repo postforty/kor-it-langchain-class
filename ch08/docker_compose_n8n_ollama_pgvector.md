@@ -59,6 +59,8 @@ services:
       - n8n_ollama_net
     environment:
       - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - C:/docker_data/ollama_models:/root/.ollama
 
 networks:
   n8n_ollama_net:
@@ -66,6 +68,7 @@ networks:
 
 volumes:
   n8n_data:
+  ollama_models:
 ```
 
 - `C:/docker_data/` 경로에 `n8n_data` 폴더를 생성하고 데이터를 저장한다. 컨테이너가 제거되어도 데이터는 보존된다.
@@ -93,7 +96,6 @@ services:
       - N8N_HOST=0.0.0.0
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
-      # pgvector 연결 환경변수 추가
       - PGHOST=pgvector-db
       - PGPORT=5432
       - PGDATABASE=n8n_db
@@ -111,6 +113,8 @@ services:
       - n8n_ollama_net
     environment:
       - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - C:/docker_data/ollama_models:/root/.ollama
 
   pgvector-db:
     image: pgvector/pgvector:pg17-trixie
@@ -134,6 +138,7 @@ networks:
 volumes:
   n8n_data:
   pgvector_data:
+  ollama_models:
 ```
 
 - `pgvector-db` 서비스 추가: `pgvector/pgvector:pg17-trixie` 이미지를 사용하는 `pgvector-db`라는 새 서비스를 추가했다. 이 서비스는 PostgreSQL과 pgvector 확장 기능을 포함한다.
