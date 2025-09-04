@@ -7,6 +7,7 @@ services:
       - "5678:5678"
     volumes:
       - C:/docker_data/n8n_data:/home/node/.n8n
+      - C:/docker_data/shared:/data/shared
     networks:
       - n8n_ollama_net
     environment:

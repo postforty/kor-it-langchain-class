@@ -90,6 +90,7 @@ services:
       - "5678:5678"
     volumes:
       - C:/docker_data/n8n_data:/home/node/.n8n
+      - C:/docker_data/shared:/data/shared
     networks:
       - n8n_ollama_net
     environment:
@@ -143,7 +144,7 @@ volumes:
 
 - `pgvector-db` 서비스 추가: `pgvector/pgvector:pg17-trixie` 이미지를 사용하는 `pgvector-db`라는 새 서비스를 추가했다. 이 서비스는 PostgreSQL과 pgvector 확장 기능을 포함한다.
 - 환경변수 설정: `pgvector-db` 서비스에 `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` 환경변수를 설정하여 데이터베이스 사용자, 비밀번호, 데이터베이스 이름을 정의했다.
-- 볼륨 추가: `C:/docker_data/`경로에 `pgvector_data`라는 새 볼륨을 추가하여 pgvector 데이터가 컨테이너를 다시 시작해도 유지되도록 설정했다.
+- 볼륨 추가: `C:/docker_data/`경로에 `pgvector_data`라는 새 볼륨을 추가하여 pgvector 데이터가 컨테이너를 다시 시작해도 유지되도록 설정했다. `shared`는 로컬 파일을 불러오기 위해 추가했다.
 - `n8n` 서비스 수정: n8n 서비스에 pgvector 데이터베이스에 연결하기 위한 환경변수(`PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`, `PGSSLMODE`)를 추가했다. `PGHOST`의 값으로 `pgvector-db`를 사용하는데, 이는 두 컨테이너가 같은 네트워크에 있으므로 컨테이너 이름을 호스트명처럼 사용할 수 있기 때문이다.
 
 ## 3\. Docker Compose 기본 명령어 및 Ollama 모델 다운로드

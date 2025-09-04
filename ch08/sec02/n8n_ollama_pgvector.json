@@ -1,0 +1,337 @@
+{
+  "name": "n8n_ollama_pgvector",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        -496
+      ],
+      "id": "137911ef-4370-486c-86d7-055847c00fe9",
+      "name": "When chat message received",
+      "webhookId": "c9d09f48-25b2-49fd-b5aa-53d3eb4ed1d7"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        -208
+      ],
+      "id": "3783307b-93ec-4be8-bf5d-88fa0284cdf6",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "2PrJHoLS0JGTlyWW",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -16
+      ],
+      "id": "ef0a7648-5ab6-4f3e-abfc-036f162aa71d",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y1hX0Mraix6Kg8xs",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "f57a83ce-e288-4698-bb74-d3005f407b61",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        192
+      ],
+      "id": "8bb8a803-399c-4b86-a40f-83d6b5d7d868",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "content": "## RAG Ingestion Process\n지식 베이스(Knowledge Base) 구축",
+        "height": 672,
+        "width": 656
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        -336
+      ],
+      "typeVersion": 1,
+      "id": "03723cf7-c92f-4e50-9171-05d2e346be1c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## QnA 봇\nWorkflow",
+        "height": 592,
+        "width": 768,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        400,
+        -608
+      ],
+      "typeVersion": 1,
+      "id": "cfd0f908-03c4-4b88-96d3-e18c2318b124",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": "gemma3n:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        576,
+        -272
+      ],
+      "id": "b68ff380-887c-454f-b346-6655dcf8b41d",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "XaSwYTP0w1u1ogI2",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        -208
+      ],
+      "id": "3ba1e7ed-6b7f-49c7-8c42-4d171a7df270",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/data/shared/*.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        -208
+      ],
+      "id": "699b751c-6eb4-4634-808b-ce6741db476b",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "content": "## PDF 파일 읽기\n\n* **모든 PDF 파일 읽기**: `/data/shared/*.pdf`\n* **특정 이름의 모든 파일**: `/data/shared/report_*.pdf` (예: `report_1.pdf`, `report_final.pdf` 등)\n* **특정 문자열을 포함하는 모든 파일**: `/data/shared/*invoice*.pdf` (예: `2025_invoice.pdf`, `invoice_report.pdf` 등)\n* **하위 디렉토리 포함**: `/data/shared/**/*.pdf` (하위 디렉토리의 모든 PDF 파일을 포함)",
+        "height": 480,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -992,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "5561a47e-daac-4a13-87ef-7eb9526f0c75",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1.6,
+      "position": [
+        704,
+        -496
+      ],
+      "id": "d1b231ba-6751-483f-8b71-759df53d816f",
+      "name": "Question and Answer Chain"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -320
+      ],
+      "id": "4680f5a7-a3bc-4208-8a45-cc8b29a780f8",
+      "name": "Vector Store Retriever"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        -176
+      ],
+      "id": "e8dd54cd-7ef0-489e-8bb3-965de262bc97",
+      "name": "Postgres PGVector Store1",
+      "credentials": {
+        "postgres": {
+          "id": "2PrJHoLS0JGTlyWW",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ec9b11cd-dd6f-4c2e-9085-fabdc341536f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "34064f0d346a8f51096415f2319faccee896f830d9714d6c686a3e4630029de5"
+  },
+  "id": "L2BSpJ9zLyS4NdGf",
+  "tags": []
+}
