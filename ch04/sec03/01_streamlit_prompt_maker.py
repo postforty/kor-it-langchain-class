@@ -23,6 +23,7 @@ if "task_input" not in st.session_state:
 
 def add_message(role, message):
     st.session_state["messages"].append(
+        # HumanMessage, AIMessage, SystemMessage와 같은 특정 역할을 가진 메시지 클래스와 달리, 'role' 매개변수를 통해 화자를 자유롭게 정의
         ChatMessage(role=role, content=message))
 
 
