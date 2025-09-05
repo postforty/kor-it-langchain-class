@@ -22,9 +22,25 @@ with st.sidebar:
 
     prompt_files = glob.glob("prompts/*.yaml")
 
-    # 추가
+    # selected_prompt = st.selectbox(
+    #     "프롬프트를 선택해 주세요", prompt_files, index=0
+    # )
+    # print("prompt_files:", prompt_files)
+    # selected_prompt = st.selectbox(
+    #     "프롬프트를 선택해 주세요", prompt_files, index=0
+    # )
+
+    prompts_dict = {
+        'prompts\\general.yaml': "일반",
+        'prompts\\pdf-rag.yaml': "PDF RAG",
+        'prompts\\prompt-maker.yaml': "프롬프트 메이커",
+        'prompts\\summary.yaml': "요약"
+    }
+
+    print(prompts_dict.items())
+
     selected_prompt = st.selectbox(
-        "프롬프트를 선택해 주세요", prompt_files, index=0
+        "프롬프트를 선택해 주세요", prompts_dict, index=0
     )
 
     task_input = st.text_input("TASK 입력", "")
@@ -51,6 +67,9 @@ def create_chain(prompt_filepath, task=""):
     # )
 
     prompt = load_prompt(prompt_filepath, encoding="utf-8")
+
+    print("선택된 프롬프트 내용:", prompt)
+
     if task:
         prompt = prompt.partial(task=task)
 
@@ -95,7 +114,7 @@ if user_input:
 print("st.session_state.messages:", st.session_state.messages)
 
 
-# 테스트
+# [테스트]
 # 프롬프트를 선택해 주세요: prompt-maker.yaml 선택
 # TASK 입력: 블러그 글 작성
-# 입력 프롬프트: 대한민국이라는 주제로 글을 작성해 주세요
+# 입력 프롬프트: 랭체인이라는 주제로 글을 작성해 주세요
