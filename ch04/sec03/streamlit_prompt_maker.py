@@ -12,7 +12,7 @@ load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
-st.title("나만의 LangChain 챗봇 만들기")
+st.title("나만의 LangChain 챗봇")
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
@@ -48,7 +48,6 @@ with st.sidebar:
     # 파일 경로를 사용자 친화적인 레이블로 매핑하는 딕셔너리 생성
     prompt_labels = {
         "prompts\\general.yaml": "일반 프롬프트",
-        "prompts\\pdf-rag.yaml": "PDF RAG 프롬프트",
         "prompts\\prompt-maker.yaml": "프롬프트 생성기",
         "prompts\\summary.yaml": "요약 프롬프트",
     }

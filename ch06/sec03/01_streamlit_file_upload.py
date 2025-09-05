@@ -4,7 +4,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import load_prompt
-# from langchain import hub
 import glob
 
 import os
@@ -23,6 +22,15 @@ if not os.path.exists(".cache/files"):  # 폴더 앞에 .을 붙이면 숨김 �
 
 if not os.path.exists(".cache/embeddings"):
     os.mkdir(".cache/embeddings")
+
+
+@st.cache_resource(show_spinner="업로드한 파일을 처리 중입니다...")
+def embed_file(file):
+    file_content = file.read()
+    file_path = f"./.cache/files/{file.name}"
+    with open(file_path, "wb") as f:
+        f.write(file_content)
+
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
@@ -48,14 +56,6 @@ print("selected_prompt:", selected_prompt)
 def add_message(role, message):
     st.session_state["messages"].append(
         ChatMessage(role=role, content=message))
-
-
-@st.cache_resource(show_spinner="업로드한 파일을 처리 중입니다...")
-def embed_file(file):
-    file_content = file.read()
-    file_path = f"./.cache/files/{file.name}"
-    with open(file_path, "wb") as f:
-        f.write(file_content)
 
 
 if uploaded_file:
@@ -105,7 +105,7 @@ if user_input:
     # chain = create_chain(selected_prompt, task=task_input)
     chain = create_chain(selected_prompt)
     # response = chain.stream({"question": st.session_state.messages})
-    response = chain.stream({"question": user_input})
+    response = chain.stream({"question": user_input, "context": ""})
 
     with st.chat_message("assistant"):
         container = st.empty()
@@ -120,11 +120,3 @@ if user_input:
     add_message("assistant", ai_answer)
 
 print("st.session_state.messages:", st.session_state.messages)
-
-
-'''
-[테스트]
-프롬프트를 선택해 주세요: prompt-maker.yaml 선택
-TASK 입력: 블러그 글 작성
-입력 프롬프트: 대한민국이라는 주제로 글을 작성해 주세요
-'''

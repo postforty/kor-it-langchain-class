@@ -1,0 +1,8 @@
+_type: "prompt"
+template: |
+  다음 컨텍스트만 사용해 질문에 답하세요.
+
+  # 컨텍스트:{context}
+
+  # 질문: {question}
+input_variables: ["context", "question"]
