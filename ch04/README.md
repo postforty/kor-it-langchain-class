@@ -12,4 +12,6 @@ uv add python-dotenv
 uv add langchain_community
 
 uv add streamlit
+
+langchain-community
 ```

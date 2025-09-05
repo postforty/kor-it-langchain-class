@@ -105,7 +105,8 @@ if user_input:
     # add_message("user", user_input)
 
     chain = create_chain(selected_prompt, task=task_input)
-    response = chain.stream({"question": st.session_state.messages})
+    # response = chain.stream({"question": st.session_state.messages})
+    response = chain.stream({"question": user_input})
 
     with st.chat_message("assistant"):
         container = st.empty()
