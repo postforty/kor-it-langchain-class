@@ -17,45 +17,59 @@ st.title("나만의 LangChain 챗봇 만들기")
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
-with st.sidebar:
-    clear_btn = st.button("대화 초기화")
-
-    prompt_files = glob.glob("prompts/*.yaml")
-
-    # selected_prompt = st.selectbox(
-    #     "프롬프트를 선택해 주세요", prompt_files, index=0
-    # )
-    # print("prompt_files:", prompt_files)
-    # selected_prompt = st.selectbox(
-    #     "프롬프트를 선택해 주세요", prompt_files, index=0
-    # )
-
-    prompts_dict = {
-        'prompts\\general.yaml': "일반",
-        'prompts\\pdf-rag.yaml': "PDF RAG",
-        'prompts\\prompt-maker.yaml': "프롬프트 메이커",
-        'prompts\\summary.yaml': "요약"
-    }
-
-    print(prompts_dict.items())
-
-    selected_prompt = st.selectbox(
-        "프롬프트를 선택해 주세요", prompts_dict, index=0
-    )
-
-    task_input = st.text_input("TASK 입력", "")
-
-print("selected_prompt:", selected_prompt)
-
-
-def print_messages():
-    for chat_message in st.session_state["messages"]:
-        st.chat_message(chat_message.role).write(chat_message.content)
+if "task_input" not in st.session_state:
+    st.session_state["task_input"] = ""
 
 
 def add_message(role, message):
     st.session_state["messages"].append(
         ChatMessage(role=role, content=message))
+
+
+def clear_task():
+    """
+    콜백 함수: 버튼 클릭 시 st.session_state를 초기화한다.
+    """
+    st.session_state["messages"] = []
+    st.session_state["task_input"] = ""
+
+
+with st.sidebar:
+    st.button("대화 초기화", on_click=clear_task)
+
+    prompt_files = glob.glob("prompts/*.yaml")
+
+    # 셀렉스 박스에 파일 경로 표시
+    # print("prompt_files:", prompt_files)
+    # selected_prompt = st.selectbox(
+    #     "프롬프트를 선택해 주세요", prompt_files, index=0
+    # )
+
+    # 파일 경로를 사용자 친화적인 레이블로 매핑하는 딕셔너리 생성
+    prompt_labels = {
+        "prompts\\general.yaml": "일반 프롬프트",
+        "prompts\\pdf-rag.yaml": "PDF RAG 프롬프트",
+        "prompts\\prompt-maker.yaml": "프롬프트 생성기",
+        "prompts\\summary.yaml": "요약 프롬프트",
+    }
+
+    selected_prompt = st.selectbox(
+        "프롬프트를 선택해 주세요",
+        prompt_files,
+        index=0,
+        format_func=lambda x: prompt_labels.get(x, x),  # 파일 경로를 레이블로 변환
+    )
+
+    task_input = st.text_input(
+        "TASK 입력", key="task_input", value=st.session_state["task_input"])
+
+print("선택된 프롬프트:", selected_prompt)
+print("선택된 프롬프트 내용:", load_prompt(selected_prompt, encoding="utf-8"))
+
+
+def print_messages():
+    for chat_message in st.session_state["messages"]:
+        st.chat_message(chat_message.role).write(chat_message.content)
 
 
 def create_chain(prompt_filepath, task=""):
@@ -67,8 +81,6 @@ def create_chain(prompt_filepath, task=""):
     # )
 
     prompt = load_prompt(prompt_filepath, encoding="utf-8")
-
-    print("선택된 프롬프트 내용:", prompt)
 
     if task:
         prompt = prompt.partial(task=task)
@@ -85,10 +97,7 @@ def create_chain(prompt_filepath, task=""):
     return chain
 
 
-if clear_btn:
-    st.session_state["messages"] = []
-
-print_messages()
+# print_messages()
 
 user_input = st.chat_input("궁금한 내용을 물어보세요!")
 
