@@ -1,7 +1,8 @@
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import PDFPlumberLoader
+from langchain_community.document_loaders import PyMuPDFLoader
+# from langchain_community.document_loaders import PDFPlumberLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -46,7 +47,8 @@ def embed_file(file):
         f.write(file_content)
 
     # 문서 로드
-    loader = PDFPlumberLoader(file_path)
+    # loader = PDFPlumberLoader(file_path)
+    loader = PyMuPDFLoader(file_path)
     documents = loader.load()
 
     # 문서 분할
@@ -112,7 +114,7 @@ def create_chain(retriever):
         {"context": retriever, "question": RunnablePassthrough()}
         | prompt
         | llm
-        | StrOutputParser()
+        | output_parsers
     )
 
     return chain
