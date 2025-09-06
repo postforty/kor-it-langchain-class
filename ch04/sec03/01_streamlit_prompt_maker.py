@@ -23,6 +23,7 @@ if "task_input" not in st.session_state:
 
 def add_message(role, message):
     st.session_state["messages"].append(
+        # HumanMessage, AIMessage, SystemMessage와 같은 특정 역할을 가진 메시지 클래스와 달리, 'role' 매개변수를 통해 화자를 자유롭게 정의
         ChatMessage(role=role, content=message))
 
 
@@ -37,6 +38,7 @@ def clear_task():
 with st.sidebar:
     st.button("대화 초기화", on_click=clear_task)
 
+    # 파일 시스템에서 지정된 패턴과 일치하는 모든 경로명을 찾는 데 사용되는 Python의 내장 라이브러리
     prompt_files = glob.glob("prompts/*.yaml")
 
     # 셀렉스 박스에 파일 경로 표시
