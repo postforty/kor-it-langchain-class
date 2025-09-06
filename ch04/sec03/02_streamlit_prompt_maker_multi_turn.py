@@ -65,6 +65,7 @@ with st.sidebar:
         "프롬프트를 선택해 주세요",
         prompt_files,
         index=0,
+# get() 메서드는 지정된 키에 해당하는 값을 가져오는 역할, 만약 해당 키가 딕셔너리에 존재하지 않을 경우, 에러를 발생시키는 대신 기본값(두번째 인수)을 반환
         format_func=lambda x: prompt_labels.get(x, x),  # 파일 경로를 레이블로 변환
     )
 
