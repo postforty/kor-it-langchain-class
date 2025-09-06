@@ -99,7 +99,7 @@ if __name__ == "__main__":
     petbot = PetBot(connection_str)
 
     # 대화 시작
-    print("챗봇과의 대화를 시작합니다. '종료'를 입력하면 대화가 끝납니다.")
+    print("펫봇과의 대화를 시작합니다. '종료'를 입력하면 대화가 끝납니다.")
     while True:
         user_question = input("사용자: ")
         if user_question.lower() == "종료":
@@ -107,4 +107,4 @@ if __name__ == "__main__":
             break
 
         bot_answer = petbot.run_petbot(user_question)
-        print(f"챗봇: {bot_answer}")
+        print(f"펫봇: {bot_answer}")

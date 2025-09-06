@@ -1,13 +1,13 @@
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import PDFPlumberLoader
+from langchain_community.document_loaders import PyMuPDFLoader
+# from langchain_community.document_loaders import PDFPlumberLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-from langchain_core.prompts import PromptTemplate, load_prompt
+from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from langchain_ollama.llms import OllamaLLM
 
 import os
 from dotenv import load_dotenv
@@ -36,12 +36,7 @@ with st.sidebar:
 
     uploaded_file = st.file_uploader("파일 업로드", type=["pdf"])
 
-    selected_model = st.selectbox(
-        "LLM 선택",
-        ["gemini-2.5-pro", "gemini-2.5-flash",
-            "gemini-2.5-flash-lite", "gemma3n:latest", "gpt-oss:20b"],
-        index=1
-    )
+    # selected_prompt = "prompts/pdf-rag.yaml"
 
 
 @st.cache_resource(show_spinner="업로드한 파일을 처리 중입니다...")
@@ -52,7 +47,8 @@ def embed_file(file):
         f.write(file_content)
 
     # 문서 로드
-    loader = PDFPlumberLoader(file_path)
+    # loader = PDFPlumberLoader(file_path)
+    loader = PyMuPDFLoader(file_path)
     documents = loader.load()
 
     # 문서 분할
@@ -96,21 +92,21 @@ def embed_file(file):
 # def create_chain(prompt_filepath):
 
 
-def create_chain(retriever, model_name="gemini-2.5-flash"):
-    # prompt = load_prompt("prompts/pdf-rag.yaml", encoding="utf-8")
-    # prompt = load_prompt("prompts/pdf-rag-page-source.yaml", encoding="utf-8")
-    prompt = load_prompt(
-        "prompts/pdf-rag-page-markdown-table.yaml", encoding="utf-8")
+def create_chain(retriever):
+    prompt = PromptTemplate.from_template(
+        '''다음 컨텍스트만 사용해 질문에 답하세요.
+    컨텍스트:{context}
 
-    if selected_model.startswith("gemini"):
-        llm = ChatGoogleGenerativeAI(
-            model=selected_model,
-            temperature=0,
-            google_api_key=gemini_api_key)
-    else:
-        llm = OllamaLLM(
-            model=selected_model,
-            base_url="http://localhost:11434")
+    질문: {question}
+    '''
+    )
+
+    # prompt = load_prompt(prompt_filepath, encoding="utf-8")
+
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        temperature=0,
+        google_api_key=gemini_api_key)
 
     output_parsers = StrOutputParser()
 
@@ -118,7 +114,7 @@ def create_chain(retriever, model_name="gemini-2.5-flash"):
         {"context": retriever, "question": RunnablePassthrough()}
         | prompt
         | llm
-        | StrOutputParser()
+        | output_parsers
     )
 
     return chain
@@ -145,8 +141,9 @@ if "chain" not in st.session_state:
 
 if uploaded_file:
     retriever = embed_file(uploaded_file)
-    chain = create_chain(retriever, model_name=selected_model)
+    chain = create_chain(retriever)
     st.session_state["chain"] = chain
+
 
 print_messages()
 

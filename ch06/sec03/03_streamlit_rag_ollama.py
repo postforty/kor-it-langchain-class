@@ -7,7 +7,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import PromptTemplate, load_prompt
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-# from langchain_ollama.llms import OllamaLLM
+from langchain_ollama.llms import OllamaLLM
 
 import os
 from dotenv import load_dotenv
@@ -37,7 +37,10 @@ with st.sidebar:
     uploaded_file = st.file_uploader("파일 업로드", type=["pdf"])
 
     selected_model = st.selectbox(
-        "LLM 선택", ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"], index=1
+        "LLM 선택",
+        ["gemini-2.5-pro", "gemini-2.5-flash",
+            "gemini-2.5-flash-lite", "gemma3n:latest", "gpt-oss:20b"],
+        index=1
     )
 
 
@@ -95,15 +98,20 @@ def embed_file(file):
 
 def create_chain(retriever, model_name="gemini-2.5-flash"):
     # prompt = load_prompt("prompts/pdf-rag.yaml", encoding="utf-8")
-    prompt = load_prompt("prompts/pdf-rag-page-source.yaml", encoding="utf-8")
+    # prompt = load_prompt("prompts/pdf-rag-page-source.yaml", encoding="utf-8")
+    prompt = load_prompt(
+        "prompts/pdf-rag-page-markdown-table.yaml", encoding="utf-8")
 
-    llm = ChatGoogleGenerativeAI(
-        model=model_name,
-        temperature=0,
-        google_api_key=gemini_api_key)
-
-    # 도커를 이용하고 있으므로 base_url을 지정해주어야 함
-    # llm = OllamaLLM(model="gemma3n:latest", base_url="http://localhost:11434")
+    if selected_model.startswith("gemini"):
+        llm = ChatGoogleGenerativeAI(
+            model=selected_model,
+            temperature=0,
+            google_api_key=gemini_api_key)
+    else:
+        # 도커를 이용하고 있으므로 base_url을 지정해주어야 함
+        llm = OllamaLLM(
+            model=selected_model,
+            base_url="http://localhost:11434")
 
     output_parsers = StrOutputParser()
 
@@ -111,7 +119,7 @@ def create_chain(retriever, model_name="gemini-2.5-flash"):
         {"context": retriever, "question": RunnablePassthrough()}
         | prompt
         | llm
-        | StrOutputParser()
+        | output_parsers
     )
 
     return chain
