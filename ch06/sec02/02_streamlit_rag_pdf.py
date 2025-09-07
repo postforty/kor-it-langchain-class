@@ -1,7 +1,7 @@
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_community.document_loaders import PyMuPDFLoader # PyPDFLoader의 경우 gemini embedding model의 quota 문제가 잘 발생하는 경향 있었음
 # from langchain_community.document_loaders import PDFPlumberLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
@@ -125,39 +125,7 @@ def print_messages():
         st.chat_message(chat_message.role).write(chat_message.content)
 
 
-def add_message(role, message):
-    st.session_state["messages"].append(
-        ChatMessage(role=role, content=message))
-
-
-if clear_btn:
-    st.session_state["messages"] = []
-
-if "mesages" not in st.session_state:
-    st.session_state["messages"] = []
-
-if "chain" not in st.session_state:
-    st.session_state["chain"] = None
-
-if uploaded_file:
-    retriever = embed_file(uploaded_file)
-    chain = create_chain(retriever)
-    st.session_state["chain"] = chain
-
-
-print_messages()
-
-user_input = st.chat_input("궁금한 내용을 물어보세요!")
-
-warning_msg = st.empty()
-
-if user_input:
-    chain = st.session_state["chain"]
-
-    if chain is not None:
-
-        st.chat_message("user").write(user_input)
-        response = chain.stream(user_input)
+def add_message(role, message)함
 
         with st.chat_message("assistant"):
             container = st.empty()
