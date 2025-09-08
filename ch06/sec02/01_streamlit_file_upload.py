@@ -23,14 +23,6 @@ if not os.path.exists(".cache/embeddings"):
     os.mkdir(".cache/embeddings")
 
 
-@st.cache_resource(show_spinner="업로드한 파일을 처리 중입니다...")
-def embed_file(file):
-    file_content = file.read()
-    file_path = f"./.cache/files/{file.name}"
-    with open(file_path, "wb") as f:
-        f.write(file_content)
-
-
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
@@ -51,6 +43,12 @@ with st.sidebar:
 
 print("selected_prompt:", selected_prompt)
 
+@st.cache_resource(show_spinner="업로드한 파일을 처리 중입니다...")
+def embed_file(file):
+    file_content = file.read()
+    file_path = f"./.cache/files/{file.name}"
+    with open(file_path, "wb") as f:
+        f.write(file_content)
 
 def add_message(role, message):
     st.session_state["messages"].append(

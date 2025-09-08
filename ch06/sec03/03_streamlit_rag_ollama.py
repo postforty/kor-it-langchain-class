@@ -64,7 +64,7 @@ def embed_file(file):
 
     # 임베딩 모델 준비
     embedding_model = GoogleGenerativeAIEmbeddings(
-        model="models/gemini-embedding-001",
+        model="gemini-embedding-001",
         google_api_key=gemini_api_key,
         # Streamlit의 동기적인 환경과 호환되도록 설정(GoogleGenerativeAIEmbeddings는 기본값은 비동기)
         transport='rest'

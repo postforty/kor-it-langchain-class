@@ -16,7 +16,7 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 class PetBot:
     def __init__(self, connection_str):
         self.embedding_model = GoogleGenerativeAIEmbeddings(
-            model="models/gemini-embedding-001",
+            model="gemini-embedding-001",
             google_api_key=gemini_api_key,
         )
         self.llm = ChatGoogleGenerativeAI(
