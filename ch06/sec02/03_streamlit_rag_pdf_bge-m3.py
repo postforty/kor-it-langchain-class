@@ -162,10 +162,6 @@ with st.sidebar:
 
     selected_prompt = "prompts/pdf-rag.yaml"
 
-# 대화 초기화
-if clear_btn:
-    clear_task()
-
 
 if "chain" not in st.session_state:
     st.session_state["chain"] = None
