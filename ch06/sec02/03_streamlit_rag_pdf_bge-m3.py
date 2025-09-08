@@ -19,7 +19,6 @@ load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
-
 st.title("PDF 기반 QA봇")
 st.caption("Ollama BGE-M3 임베딩 + Gemini-2.5-FLASH")
 
@@ -146,8 +145,6 @@ def clear_task():
         shutil.rmtree(".cache/embeddings")
     os.makedirs(".cache/embeddings")
 
-    st.rerun()  # 파일 업로더를 포함한 전체 앱을 초기화
-
 
 with st.sidebar:
     # * on_click 인자로 clear_task 함수를 직접 호출
@@ -161,7 +158,6 @@ with st.sidebar:
         "파일 업로드", type=["pdf"], key=st.session_state.file_uploader_key)
 
     selected_prompt = "prompts/pdf-rag.yaml"
-
 
 if "chain" not in st.session_state:
     st.session_state["chain"] = None
