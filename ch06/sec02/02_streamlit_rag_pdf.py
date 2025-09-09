@@ -22,14 +22,14 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 st.title("PDF 기반 QA봇")
 st.caption("gemini-embedding-001 + Gemini-2.5-FLASH") # * 캡션 추가
 
-if not os.path.exists(".cache"):
+if not os.path.exists(".cache"):  # * 폴더 앞에 .을 붙이면 숨김 처리함(Linux, macOS)을 의미
     os.mkdir(".cache")
-
-if not os.path.exists(".cache/files"):  # * 폴더 앞에 .을 붙이면 숨김 처리함(Linux, macOS)을 의미
-    os.makedirs(".cache/files")
     # * Windows에서 .cache 폴더를 숨김 처리
     if os.name == 'nt':
         os.system('attrib +h .cache')
+
+if not os.path.exists(".cache/files"):
+    os.makedirs(".cache/files") 
 
 if not os.path.exists(".cache/embeddings"):
     os.mkdir(".cache/embeddings")
@@ -78,25 +78,24 @@ def embed_file(file):
     with open(file_path, "wb") as f:
         f.write(file_content)
 
-    # 문서 로드
+    # * 문서 로드
     # loader = PDFPlumberLoader(file_path)
     loader = PyMuPDFLoader(file_path)
     documents = loader.load()
 
-    # 문서 분할
+    # * 문서 분할
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200,
     )
     splitted_documents = text_splitter.split_documents(documents)
 
-    
     # print("splitted_documents:", splitted_documents)
 
     # * 벡터스토어 생성 또는 로드
     vectorstore = _get_or_create_vectorstore(file.name, splitted_documents)
 
-    # 리트리버 생성
+    # * 리트리버 생성
     retriever = vectorstore.as_retriever()
     return retriever
 
@@ -120,7 +119,6 @@ def create_chain(retriever, prompt_filepath):
 
     return chain
 
-
 def print_messages():
     for chat_message in st.session_state["messages"]:
         st.chat_message(chat_message.role).write(chat_message.content)
@@ -129,6 +127,7 @@ def add_message(role, message):
     st.session_state["messages"].append(
         ChatMessage(role=role, content=message))
 
+# 대화 초기화
 def clear_task():
     st.session_state["messages"] = []
     st.session_state["chain"] = None
@@ -147,7 +146,7 @@ def clear_task():
     os.makedirs(".cache/embeddings")
 
 with st.sidebar:
-    clear_btn = st.button("대화 초기화", on_click=clear_task) # * on_click 인자로 clear_task 함수를 직접 호출
+    clear_btn = st.button("대화 초기화", on_click=clear_task) # on_click 인자로 clear_task 함수를 직접 호출
 
     # * `st.session_state.file_uploader_key`의 상태를 확인하여 업로더를 조건부로 렌더링
     if 'file_uploader_key' not in st.session_state:
@@ -178,20 +177,21 @@ if st.session_state["chain"] is None:
 # print("uploaded_file:", uploaded_file)
 
 if uploaded_file:
+    # * 벡터 저장소, 체인 생성
     retriever = embed_file(uploaded_file)
     chain = create_chain(retriever, selected_prompt)
     st.session_state["chain"] = chain
 
 user_input = st.chat_input("무엇이 궁궁하신가요?")
 
-warning_msg = st.empty()
+warning_msg = st.empty() # * 파일 업로드 경고 메시지
+
+print_messages()
 
 if user_input:
-    chain = st.session_state["chain"]
-
-    if chain is not None:
+    if st.session_state["chain"] is not None:
         st.chat_message("user").write(user_input)
-        response = chain.stream(user_input)
+        response = st.session_state["chain"].stream(user_input) # * RunnablePassthrough()에 문자열 전달
 
         with st.chat_message("assistant"):
             container = st.empty()
@@ -209,8 +209,8 @@ if user_input:
 
 print("st.session_state.messages:", st.session_state.messages)
 
-# 질문 예시
-# query = "Advance RAG 기법이 임상시험 데이터 분석에서 수행하는 주요 역할은 무엇인가요?"
-# query = "본 연구에서 Private LLM 성능을 평가하기 위해 사용한 지표 3가지는 무엇인가요?"
-query = "본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?"
-# query = "ROUGE 평가에서 Private LLM과 ChatGPT의 Recall 값은 각각 얼마였나요?"
+# [질문 예시]
+# Advance RAG 기법이 임상시험 데이터 분석에서 수행하는 주요 역할은 무엇인가요?
+# 본 연구에서 Private LLM 성능을 평가하기 위해 사용한 지표 3가지는 무엇인가요?
+# PDF문서 5쪽 - 본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?
+# PDF문서 10쪽 - ROUGE 평가에서 Private LLM과 ChatGPT의 Recall 값은 각각 얼마였나요?
