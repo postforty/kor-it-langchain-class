@@ -209,5 +209,5 @@ print("st.session_state.messages:", st.session_state.messages)
 # 질문 예시
 # Advance RAG 기법이 임상시험 데이터 분석에서 수행하는 주요 역할은 무엇인가요?
 # 본 연구에서 Private LLM 성능을 평가하기 위해 사용한 지표 3가지는 무엇인가요?
-# 본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?
-# ROUGE 평가에서 Private LLM과 ChatGPT의 Recall 값은 각각 얼마였나요?
+# PDF문서 5쪽 - 본 연구에서 Private LLM 구축을 위해 수집한 문서의 총 페이지 수와 문서 유형별 비율은 어떻게 되나요?
+# PDF문서 10쪽 - ROUGE 평가에서 Private LLM과 ChatGPT의 Recall 값은 각각 얼마였나요?

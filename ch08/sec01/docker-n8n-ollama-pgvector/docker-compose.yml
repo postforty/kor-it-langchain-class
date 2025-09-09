@@ -14,6 +14,7 @@ services:
       - N8N_HOST=0.0.0.0
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678
       - PGHOST=pgvector-db
       - PGPORT=5432
       - PGDATABASE=n8n_db
