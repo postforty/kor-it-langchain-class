@@ -19,16 +19,13 @@ if "messages" not in st.session_state:
 with st.sidebar:  # 추가
     clear_btn = st.button("초기화")
 
-
 def print_messages():
     for chat_message in st.session_state["messages"]:
         st.chat_message(chat_message.role).write(chat_message.content)
 
-
 def add_message(role, message):
     st.session_state["messages"].append(
         ChatMessage(role=role, content=message))
-
 
 def create_chain():  # 체인
     prompt = ChatPromptTemplate.from_messages(
@@ -59,7 +56,7 @@ if user_input:  # 수정
 
     chain = create_chain()
 
-    # 답변히 완전히 생성되면 출력
+    # 답변이 완전히 생성되면 출력
     # response = chain.invoke({"question": user_input}) # 질문만 넘김
     response = chain.invoke(
         {"question": st.session_state.messages})  # 모든 대화 리스트를 넘김
@@ -67,10 +64,9 @@ if user_input:  # 수정
     st.chat_message("assistant").write(response)
     add_message("assistant", response)
 
-    # response = chain.stream(
-    #     {"question": st.session_state.messages})  # 모든 대화 리스트를 넘김
-
     # 타이핑하듯이 답변 출력
+    # response = chain.stream(
+    #     {"question": st.session_state.messages})
     # with st.chat_message("assistant"):
     #     container = st.empty()  # 페이지 전체를 다시 로드하지 않고도 콘텐츠를 동적으로 업데이트하는 빈 컨테이너 생성
 

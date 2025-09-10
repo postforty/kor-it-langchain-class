@@ -1,6 +1,7 @@
 # 공식 문서: https://streamlit.io/playground?example=llm_chat
 # user, assistant 동일 대화 출력
 # 실행 명령: uv run streamlit run 01_streamlit.py
+# 종료 방법: ctrl + c
 import streamlit as st
 
 st.title("나만의 챗봇 만들기")
