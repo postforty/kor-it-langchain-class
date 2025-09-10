@@ -125,8 +125,8 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=n8n
-      - POSTGRES_PASSWORD=n8n
+      - POSTGRES_USER=langchain
+      - POSTGRES_PASSWORD=langchain
       - POSTGRES_DB=n8n_db
     volumes:
       - C:/docker_data/pgvector_data:/var/lib/postgresql/data
