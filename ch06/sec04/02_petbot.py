@@ -24,7 +24,7 @@ class PetBot:
 
         # PGVector 객체 초기화 (기존 컬렉션을 사용)
         self.vector_store = PGVector(
-            collection_name="chat_history",  # 대화 기록을 저장할 컬렉션 이름
+            collection_name="chat_history",  # 대화 기록을 저장할 컬렉션(대화 세션의 고유한 식별자로 사용될 수 있음) 이름(여기에서는 chat_history로 고정)
             connection=connection_str,
             embeddings=self.embedding_model
         )
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     print("펫봇과의 대화를 시작합니다. '종료'를 입력하면 대화가 끝납니다.")
     while True:
         user_question = input("사용자: ")
-        if user_question.lower() == "종료":
+        if user_question == "종료":
             print("대화를 종료합니다.")
             break
 
