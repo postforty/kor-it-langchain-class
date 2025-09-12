@@ -53,6 +53,10 @@ def get_yf_stock_history(stock_history_input: StockHistoryInput) -> str:
 
     return history_md
 
+# * 덕덕고 웹검색 도구 추가
+from langchain_community.tools import DuckDuckGoSearchResults 
+web_search = DuckDuckGoSearchResults(output_format="list", name="web_search", description="웹 검색이 필요할 때 사용합니다.")
+
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
@@ -69,10 +73,10 @@ def add_message(role, message):
 
 def create_chain():
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash", google_api_key=gemini_api_key)
+        model="gemini-2.0-flash", google_api_key=gemini_api_key)
 
     # * 도구 바인딩
-    tools = [get_current_time, get_yf_stock_history]
+    tools = [get_current_time, get_yf_stock_history, web_search]
 
     # * 에이전트 프롬프트 정의
     prompt = ChatPromptTemplate.from_messages([
@@ -126,4 +130,5 @@ print(st.session_state["messages"])
 
 # [질문 예시]
 # 부산은 지금 몇시야?
-# 테슬라는 한달 전에 비해 주가가 올랐나 내렸나?
+# 테슬라(TSLA)는 한달 전에 비해 주가가 올랐나 내렸나?
+# KT 소액 결제 사건의 원인은?
