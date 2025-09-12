@@ -164,6 +164,7 @@
 - n8n을 설치하기 (Docker)
 - n8n으로 RAG 챗봇 워크 플로우 만들기
 - n8n에서 LLM 모델 교체 해보기 (Ollama)
+- n8n에서 RAG 챗봇 공유하기
 
 ---
 

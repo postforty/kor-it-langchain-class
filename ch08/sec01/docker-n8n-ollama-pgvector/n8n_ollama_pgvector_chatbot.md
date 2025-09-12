@@ -20,7 +20,7 @@
 
 ROUGE 평가에서 Private LLM과 ChatGPT의 Recall 값은 각각 얼마였나요?
 
-### 3. 챗봇 서비스
+### 3. 챗봇 공유
 
 #### 1단계
 
