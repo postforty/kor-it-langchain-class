@@ -18,8 +18,8 @@ services:
       - PGHOST=pgvector-db
       - PGPORT=5432
       - PGDATABASE=n8n_db
-      - PGUSER=n8n
-      - PGPASSWORD=n8n
+      - PGUSER=langchain
+      - PGPASSWORD=langchain
       - PGSSLMODE=require
 
   ollama:
