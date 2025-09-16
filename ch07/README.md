@@ -18,7 +18,7 @@ uv add tzdata
 uv add yfinance
 
 # 웹검색 기능
-uv add duckduckgo-search
+uv add ddgs
 
 uv add streamlit
 
