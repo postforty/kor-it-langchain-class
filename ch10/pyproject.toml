@@ -4,4 +4,14 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "ipykernel>=6.30.1",
+    "jupyter>=1.1.1",
+    "jupyterlab>=4.4.5",
+    "langchain>=0.3.27",
+    "langchain-community>=0.3.27",
+    "langchain-docling>=1.1.0",
+    "langchain-google-genai>=2.1.10",
+    "langchain-postgres>=0.0.15",
+    "langgraph>=0.6.7",
+]
