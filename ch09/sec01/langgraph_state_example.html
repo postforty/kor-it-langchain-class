@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>결재 프로세스로 이해하는 LangGraph 상태 관리</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        color: #2c3e50;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .comparison {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+      }
+
+      .section {
+        background: #f8f9ff;
+        border-radius: 15px;
+        padding: 30px;
+        border-left: 5px solid #667eea;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+      }
+
+      .process-flow {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .workflow {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        overflow-x: auto;
+        position: relative;
+        padding-bottom: 20px;
+      }
+
+      .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        border-radius: 12px;
+        border: 2px solid #e1e8ed;
+        background: #ffffff;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        min-width: 180px;
+        flex-shrink: 0;
+      }
+
+      .step:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        border-color: #667eea;
+      }
+
+      .step.active {
+        border-color: #667eea;
+        background: linear-gradient(45deg, #667eea10, #764ba210);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+      }
+
+      .step.rejected {
+        border-color: #e74c3c;
+        background: linear-gradient(45deg, #e74c3c10, #ff634710);
+      }
+
+      .step.approved {
+        border-color: #27ae60;
+        background: linear-gradient(45deg, #27ae6010, #2ecc7110);
+      }
+
+      .step-icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+        min-width: 60px;
+        text-align: center;
+      }
+
+      .step-content {
+        text-align: center;
+      }
+
+      .step-title {
+        font-weight: bold;
+        font-size: 1.2em;
+        color: #2c3e50;
+        margin-bottom: 8px;
+      }
+
+      .step-description {
+        color: #7f8c8d;
+        margin-bottom: 10px;
+      }
+
+      .step-status {
+        font-size: 0.9em;
+        padding: 4px 12px;
+        border-radius: 20px;
+        display: inline-block;
+        font-weight: bold;
+      }
+
+      .status-pending {
+        background: #f39c12;
+        color: white;
+      }
+
+      .status-approved {
+        background: #27ae60;
+        color: white;
+      }
+
+      .status-rejected {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .status-completed {
+        background: #3498db;
+        color: white;
+      }
+
+      .document-state {
+        background: #2c3e50;
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        line-height: 1.4;
+        white-space: pre;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 30px 0;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .btn-success {
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        color: white;
+      }
+
+      .btn-danger {
+        background: linear-gradient(45deg, #e74c3c, #ff6347);
+        color: white;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .explanation {
+        background: linear-gradient(45deg, #667eea10, #764ba210);
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        border-left: 5px solid #667eea;
+      }
+
+      .code-block {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        overflow-x: auto;
+      }
+
+      .arrow {
+        font-size: 1.5em;
+        color: #667eea;
+        margin: 0 10px;
+        align-self: center;
+      }
+
+      @media (max-width: 768px) {
+        .comparison {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 20px;
+        }
+
+        .controls {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🏢 결재 프로세스로 이해하는 LangGraph 상태 관리</h1>
+      </div>
+
+      <div class="comparison">
+        <div class="section">
+          <h2>🏢 회사 결재 프로세스</h2>
+          <ul>
+            <li><strong>문서 작성</strong> 📝 - 초기 상태 생성</li>
+            <li><strong>순차적 검토</strong> 👥 - 노드별 처리</li>
+            <li><strong>의견 추가</strong> 💭 - 상태 업데이트</li>
+            <li><strong>승인/반려</strong> ✅❌ - 조건부 분기</li>
+            <li><strong>순환 가능</strong> 🔄 - 반려 시 재작업</li>
+            <li><strong>히스토리 보존</strong> 📊 - 전체 과정 추적</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🤖 LangGraph 상태 관리</h2>
+          <ul>
+            <li><strong>State 초기화</strong> 🎯 - 초기 데이터 설정</li>
+            <li><strong>노드 순회</strong> 🔗 - 단계별 처리</li>
+            <li><strong>상태 갱신</strong> 🔄 - 데이터 누적</li>
+            <li><strong>조건부 라우팅</strong> 🛣️ - 동적 흐름 제어</li>
+            <li><strong>루프 처리</strong> ♻️ - 반복 실행</li>
+            <li><strong>상태 추적</strong> 📈 - 전체 실행 기록</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="process-flow">
+        <h2>📋 인터랙티브 결재 프로세스 시뮬레이션</h2>
+
+        <div class="workflow" id="workflow">
+          <div class="step active" data-step="0">
+            <div class="step-icon">📝</div>
+            <div class="step-content">
+              <div class="step-title">문서 작성</div>
+              <div class="step-description">직원이 결재 문서를 작성합니다</div>
+              <div class="step-status status-approved">작성 완료</div>
+            </div>
+          </div>
+
+          <div class="arrow">➡️</div>
+
+          <div class="step" data-step="1">
+            <div class="step-icon">👨‍💼</div>
+            <div class="step-content">
+              <div class="step-title">팀장 검토</div>
+              <div class="step-description">
+                팀장이 문서를 검토하고 의견을 추가합니다
+              </div>
+              <div class="step-status status-pending">검토 대기</div>
+            </div>
+          </div>
+
+          <div class="arrow">➡️</div>
+
+          <div class="step" data-step="2">
+            <div class="step-icon">👩‍💼</div>
+            <div class="step-content">
+              <div class="step-title">부장 검토</div>
+              <div class="step-description">
+                부장이 문서를 검토합니다 (반려 가능)
+              </div>
+              <div class="step-status status-pending">검토 대기</div>
+            </div>
+          </div>
+
+          <div class="arrow">➡️</div>
+
+          <div class="step" data-step="3">
+            <div class="step-icon">🎩</div>
+            <div class="step-content">
+              <div class="step-title">임원 최종 승인</div>
+              <div class="step-description">임원이 최종 승인을 진행합니다</div>
+              <div class="step-status status-pending">검토 대기</div>
+            </div>
+          </div>
+
+          <div class="arrow">➡️</div>
+
+          <div class="step" data-step="4">
+            <div class="step-icon">✅</div>
+            <div class="step-content">
+              <div class="step-title">결재 완료</div>
+              <div class="step-description">
+                모든 검토가 완료되어 결재가 승인되었습니다
+              </div>
+              <div class="step-status status-pending">대기중</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="document-state" id="documentState">
+          { "document_id": "DOC-2024-001", "title": "신규 프로젝트 예산 승인
+          요청서", "status": "작성완료", "current_step": "문서작성",
+          "approvals": [ { "role": "작성자", "name": "김직원", "action": "작성",
+          "timestamp": "2024-09-17 09:00:00", "comment": "신규 AI 프로젝트 예산
+          500만원 승인 요청" } ], "rejection_count": 0, "total_steps": 4 }
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-primary" onclick="nextStep()" id="nextBtn">
+            다음 단계 진행 ⏭️
+          </button>
+          <button
+            class="btn btn-danger"
+            onclick="rejectDocument()"
+            id="rejectBtn"
+            style="display: none"
+          >
+            반려하기 ❌
+          </button>
+          <button class="btn btn-success" onclick="resetDemo()" id="resetBtn">
+            처음부터 다시 🔄
+          </button>
+        </div>
+      </div>
+
+      <div class="explanation">
+        <h3>🎯 핵심 개념 설명</h3>
+
+        <div class="code-block">
+          # LangGraph 상태 관리 예시 class ApprovalState(TypedDict):
+          document_id: str title: str status: str current_step: str approvals:
+          List[Dict] rejection_count: int def team_leader_review(state:
+          ApprovalState): """팀장 검토 노드 - 상태 업데이트""" new_approval = {
+          "role": "팀장", "action": "승인", "timestamp": datetime.now(),
+          "comment": "팀장 검토 완료" } return { **state, "approvals":
+          state["approvals"] + [new_approval], "current_step": "부장검토",
+          "status": "팀장승인완료" }
+        </div>
+
+        <p><strong>🔄 순환 처리의 중요성:</strong></p>
+        <p>
+          부장이 문서를 반려하면, 문서는 다시 작성자에게 돌아가 수정 후
+          재제출됩니다. 이는 LangGraph의 루프 기능과 정확히 일치합니다. 상태는
+          보존되되, 특정 조건에 따라 이전 단계로 되돌아갈 수 있습니다.
+        </p>
+
+        <div class="code-block">
+          def should_return_to_author(state: ApprovalState) -> str: """조건부
+          라우팅 - 반려 시 작성자에게 회송""" if state["status"] == "반려":
+          return "문서수정" else: return "다음단계"
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 페이지 로드 시 현재 시간으로 초기 상태 설정
+      const initialTimestamp = new Date().toLocaleString("ko-KR");
+      let currentStep = 0;
+      let documentState = {
+        document_id: "DOC-2024-001",
+        title: "신규 프로젝트 예산 승인 요청서",
+        status: "작성완료",
+        current_step: "문서작성",
+        approvals: [
+          {
+            role: "작성자",
+            name: "김직원",
+            action: "작성",
+            timestamp: initialTimestamp, // 최초 로드 시 시간으로 설정
+            comment: "신규 AI 프로젝트 예산 500만원 승인 요청",
+          },
+        ],
+        rejection_count: 0,
+        total_steps: 4,
+      };
+
+      const steps = [
+        { name: "문서작성", role: "작성자", icon: "📝", canReject: false },
+        { name: "팀장검토", role: "팀장", icon: "👨‍💼", canReject: true },
+        { name: "부장검토", role: "부장", icon: "👩‍💼", canReject: true },
+        { name: "임원승인", role: "임원", icon: "🎩", canReject: true },
+        { name: "결재완료", role: "시스템", icon: "✅", canReject: false },
+      ];
+
+      function updateUI() {
+        const stepElements = document.querySelectorAll(".step");
+        stepElements.forEach((element, index) => {
+          element.classList.remove("active", "approved", "rejected");
+
+          if (index < currentStep) {
+            element.classList.add("approved");
+            element.querySelector(".step-status").textContent = "승인 완료";
+            element.querySelector(".step-status").className =
+              "step-status status-approved";
+          } else if (index === currentStep) {
+            element.classList.add("active");
+            element.querySelector(".step-status").textContent = "검토중";
+            element.querySelector(".step-status").className =
+              "step-status status-pending";
+          } else {
+            element.querySelector(".step-status").textContent = "검토 대기";
+            element.querySelector(".step-status").className =
+              "step-status status-pending";
+          }
+        });
+
+        const nextBtn = document.getElementById("nextBtn");
+        const rejectBtn = document.getElementById("rejectBtn");
+
+        if (currentStep >= steps.length - 1) {
+          nextBtn.style.display = "none";
+          rejectBtn.style.display = "none";
+          document.querySelector(
+            '.step[data-step="4"] .step-status'
+          ).textContent = "결재 완료";
+          document.querySelector(
+            '.step[data-step="4"] .step-status'
+          ).className = "step-status status-completed";
+        } else {
+          nextBtn.style.display = "inline-block";
+          rejectBtn.style.display = steps[currentStep].canReject
+            ? "inline-block"
+            : "none";
+        }
+
+        document.getElementById("documentState").textContent = JSON.stringify(
+          documentState,
+          null,
+          2
+        );
+      }
+
+      function nextStep() {
+        if (currentStep >= steps.length - 1) return;
+
+        const step = steps[currentStep];
+        const approval = {
+          role: step.role,
+          name: `${
+            step.role === "작성자"
+              ? "김직원"
+              : step.role === "팀장"
+              ? "이팀장"
+              : step.role === "부장"
+              ? "박부장"
+              : "최임원"
+          }`,
+          action: "승인",
+          timestamp: new Date().toLocaleString("ko-KR"),
+          comment: `${step.name} 단계 승인 완료 ✅`,
+        };
+
+        documentState.approvals.push(approval);
+        documentState.current_step =
+          currentStep < steps.length - 1 ? steps[currentStep + 1].name : "완료";
+        documentState.status =
+          currentStep < steps.length - 1
+            ? `${step.name}_승인완료`
+            : "최종승인완료";
+
+        currentStep++;
+        updateUI();
+
+        if (currentStep >= steps.length - 1) {
+          setTimeout(() => {
+            alert(
+              "🎉 결재가 완료되었습니다! LangGraph처럼 모든 상태가 순차적으로 처리되었습니다."
+            );
+          }, 500);
+        }
+      }
+
+      function rejectDocument() {
+        const step = steps[currentStep];
+
+        const rejectionReasons = [
+          "예산 내용이 부족합니다. 상세한 내역을 추가해주세요.",
+          "프로젝트 일정이 명확하지 않습니다.",
+          "투자 효과에 대한 분석이 필요합니다.",
+          "관련 부서와의 협의가 필요합니다.",
+        ];
+
+        const rejectionReason =
+          rejectionReasons[Math.floor(Math.random() * rejectionReasons.length)];
+
+        const rejection = {
+          role: step.role,
+          name: `${
+            step.role === "팀장"
+              ? "이팀장"
+              : step.role === "부장"
+              ? "박부장"
+              : "최임원"
+          }`,
+          action: "반려",
+          timestamp: new Date().toLocaleString("ko-KR"),
+          comment: `❌ ${rejectionReason}`,
+        };
+
+        documentState.approvals.push(rejection);
+        documentState.rejection_count++;
+        documentState.current_step = "문서수정";
+        documentState.status = `${step.name}_반려`;
+
+        const stepElement = document.querySelector(
+          `.step[data-step="${currentStep}"]`
+        );
+        stepElement.classList.add("rejected");
+        stepElement.querySelector(".step-status").textContent = "반려됨";
+        stepElement.querySelector(".step-status").className =
+          "step-status status-rejected";
+
+        setTimeout(() => {
+          alert(
+            `📋 문서가 반려되어 작성자에게 돌아갑니다.\n반려 사유: ${rejectionReason}\n\n이것이 바로 LangGraph의 순환(loop) 기능입니다! 🔄`
+          );
+
+          currentStep = 0;
+          documentState.current_step = "문서재작성";
+          documentState.status = "수정중";
+
+          setTimeout(() => {
+            const revision = {
+              role: "작성자",
+              name: "김직원",
+              action: "수정완료",
+              timestamp: new Date().toLocaleString("ko-KR"),
+              comment: `📝 반려 사유 반영하여 문서 수정 완료 (${documentState.rejection_count}차 수정)`,
+            };
+
+            documentState.approvals.push(revision);
+            documentState.current_step = "팀장검토";
+            documentState.status = "수정완료";
+
+            updateUI();
+          }, 1000);
+        }, 1000);
+
+        updateUI();
+      }
+
+      function resetDemo() {
+        currentStep = 0;
+        documentState = {
+          document_id: "DOC-2024-001",
+          title: "신규 프로젝트 예산 승인 요청서",
+          status: "작성완료",
+          current_step: "문서작성",
+          approvals: [
+            {
+              role: "작성자",
+              name: "김직원",
+              action: "작성",
+              timestamp: new Date().toLocaleString("ko-KR"), // 리셋 시에도 현재 시간으로 설정
+              comment: "신규 AI 프로젝트 예산 500만원 승인 요청",
+            },
+          ],
+          rejection_count: 0,
+          total_steps: 4,
+        };
+
+        document.querySelectorAll(".step").forEach((element) => {
+          element.classList.remove("active", "approved", "rejected");
+        });
+
+        updateUI();
+      }
+
+      updateUI();
+    </script>
+  </body>
+</html>
