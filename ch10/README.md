@@ -11,23 +11,9 @@ uv add python-dotenv
 
 uv add pypdf langchain langchain_community
 
-uv add langchain-ollama
-
-uv add py-zerox
-
-uv add nest_asyncio
-
-uv add "unstructured[md]" nltk
-
 uv add langchain-text-splitters
 
-uv add markdown html2text beautifulsoup4
+uv add pytz # 타임존
 
-uv add langchain_postgres
-
-uv add selenium
+uv add ddgs # 웹검색
 ```
-
-### 랭체인 구글 제미나이 임베딩
-
-> 원문: <https://python.langchain.com/docs/integrations/text_embedding/google_generative_ai/>
