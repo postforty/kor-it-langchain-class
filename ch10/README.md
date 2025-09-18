@@ -16,4 +16,6 @@ uv add langchain-text-splitters
 uv add pytz # 타임존
 
 uv add ddgs # 웹검색
+
+uv add beautifulsoup4
 ```
