@@ -21,7 +21,7 @@ uv add "unstructured[md]" nltk
 
 uv add langchain-text-splitters
 
-uv add markdown html2text beautifulsoup4
+uv add beautifulsoup4
 
 uv add langchain_postgres
 
