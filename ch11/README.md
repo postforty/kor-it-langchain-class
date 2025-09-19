@@ -15,15 +15,9 @@ uv add langgraph
 
 uv add langchain-ollama
 
-uv add nest_asyncio
-
-uv add "unstructured[md]" nltk
-
 uv add langchain-text-splitters
 
 uv add beautifulsoup4
-
-uv add langchain_postgres
 
 # 비동기 HTTP 요청 처리
 uv add httpx
