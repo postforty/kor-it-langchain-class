@@ -11,6 +11,8 @@ uv add python-dotenv
 
 uv add pypdf langchain langchain_community
 
+uv add langgraph
+
 uv add langchain-text-splitters
 
 uv add pytz # 타임존
