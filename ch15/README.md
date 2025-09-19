@@ -27,4 +27,6 @@ uv add fastmcp
 
 # https://github.com/langchain-ai/langchain-mcp-adapters
 uv add langchain-mcp-adapters
+
+uv add langchain-google-vertexai
 ```

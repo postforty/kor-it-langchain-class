@@ -12,6 +12,7 @@ dependencies = [
     "langchain>=0.3.27",
     "langchain-community>=0.3.29",
     "langchain-google-genai>=2.1.12",
+    "langchain-google-vertexai>=2.1.2",
     "langchain-mcp-adapters>=0.1.9",
     "langgraph>=0.6.7",
     "pypdf>=6.0.0",
