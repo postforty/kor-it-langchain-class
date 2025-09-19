@@ -15,4 +15,5 @@ dependencies = [
     "langchain-community>=0.3.27",
     "langchain-google-genai>=2.1.10",
     "langgraph>=0.6.7",
+    "selenium>=4.35.0",
 ]
