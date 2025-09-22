@@ -1,0 +1,19 @@
+[project]
+name = "docling_tutorial"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "faiss-cpu>=1.12.0",
+    "fastapi>=0.117.1",
+    "langchain>=0.3.27",
+    "langchain-community>=0.3.29",
+    "langchain-ollama>=0.3.8",
+    "langchain-upstage>=0.7.3",
+    "langserve[all]>=0.3.2",
+    "pdfplumber>=0.11.7",
+    "python-dotenv>=1.1.1",
+    "streamlit>=1.49.1",
+    "uvicorn>=0.36.0",
+]
