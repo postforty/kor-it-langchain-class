@@ -35,7 +35,7 @@ if "is_retest" not in st.session_state:
 
 # Langchain 모델 및 FAISS DB 초기화
 chat = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=gemini_api_key)
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", 
+embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", 
     google_api_key=gemini_api_key, 
     transport='rest' # Streamlit의 동기적인 환경과 호환되도록 설정(GoogleGenerativeAIEmbeddings는 기본값은 비동기)
 )

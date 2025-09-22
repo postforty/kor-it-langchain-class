@@ -29,4 +29,8 @@ uv add fastmcp
 uv add langchain-mcp-adapters
 
 uv add langchain-google-vertexai
+
+uv add streamlit
+
+uv add faiss-cpu
 ```
