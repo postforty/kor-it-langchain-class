@@ -27,6 +27,7 @@ uv add markdown html2text beautifulsoup4
 
 uv add langchain_postgres
 
+uv add pyppeteer
 ```
 
 ### 랭체인 구글 제미나이 임베딩
