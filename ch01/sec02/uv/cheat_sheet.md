@@ -32,22 +32,10 @@
   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
   ```
 
-- **pip을 이용한 설치**
-
-  ```bash
-  pip install uv
-  ```
-
-- **pipx를 이용한 설치**
-
-  ```bash
-  pipx install uv
-  ```
-
 ### 2-2. UV 명령어 환경변수 추가
 
-- 윈도우의 경우 모든 터미널을 닫기 다시 시도.
-- 설치 후 `uv` 명령어가 인식되지 않을 경우, 환경변수에 추가한다(리눅스).
+- **윈도우**의 경우 모든 터미널을 닫기 다시 시도.
+- **리눅스**의 경우 설치 후 `uv` 명령어가 인식되지 않으면, 환경변수에 추가한다.
 
   ```bash
   export PATH="/root/.local/bin:$PATH"
@@ -244,3 +232,41 @@ deactivate
 
 - `uv`로 관리되는 가상 환경에서 Jupyter Notebook을 사용할 경우, VS Code에서 Jupyter 커널 선택 시 `.venv`와 같은 해당 가상 환경을 선택해야 정상적으로 동작한다.
 - 가상 환경에서 Jupyter Notebook 관련 의존성(예: `ipykernel`)을 설치할 때는 `pip` 대신 `uv add` 명령어를 사용한다. 예를 들어, `uv add ipykernel`과 같이 사용한다.
+
+## 6. UV 삭제 방법
+
+### 6-1. 데이터 및 캐시 정리(선택)
+
+- uv가 저장한 데이터(캐시, 파이썬, 툴 디렉터리 등)를 먼저 정리할 수 있다.
+- 아래 명령어를 순서대로 실행:
+
+```bash
+uv cache clean
+rm -r "$(uv python dir)"
+rm -r "$(uv tool dir)"
+```
+
+- Windows PowerShell에서는:
+
+```pwsh
+uv cache clean
+Remove-Item -Recurse -Force "$HOME\.uv\python"
+Remove-Item -Recurse -Force "$HOME\.uv\tool"
+```
+
+### 6-2. uv, uvx, uvw 바이너리 삭제
+
+- macOS/Linux:
+  ```bash
+  rm ~/.local/bin/uv ~/.local/bin/uvx ~/.local/bin/uvw
+  ```
+- Windows PowerShell:
+  ```pwsh
+  Remove-Item $HOME\.local\bin\uv.exe
+  Remove-Item $HOME\.local\bin\uvx.exe
+  Remove-Item $HOME\.local\bin\uvw.exe
+  ```
+
+---
+
+자세한 내용은 [uv 공식 문서](https://docs.astral.sh/uv/getting-started/installation/#shell-autocompletion) 참고
