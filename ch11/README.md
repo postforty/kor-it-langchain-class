@@ -11,6 +11,8 @@ uv add langchain-google-genai
 
 uv add python-dotenv
 
+uv add ddgs
+
 uv add pypdf langchain langchain_community
 
 uv add langgraph

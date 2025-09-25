@@ -8,9 +8,11 @@ from bs4 import BeautifulSoup
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.tools import tool  # Tool 데코레이터만 유지
 import json
+import asyncio
 from langgraph.graph import StateGraph, END
 from dotenv import load_dotenv
 from page_analyzer import PageAnalyzer
+from langchain_core.runnables.graph_mermaid import MermaidDrawMethod
 load_dotenv()
 
 
@@ -78,9 +80,8 @@ def analyze_page_elements(query: str, **kwargs) -> str:
     # 현재 페이지의 HTML 콘텐츠 가져오기
     html_content = driver.page_source
 
-    # 페이지 분석 에이전트 실행
-    analyzer = PageAnalyzer()
-    result = analyzer.run(query=query, html_content=html_content)
+    # 전역 페이지 분석 에이전트 사용
+    result = page_analyzer.run(query=query, html_content=html_content)
 
     if result.get("selector"):
         selector = result["selector"]
@@ -91,13 +92,42 @@ def analyze_page_elements(query: str, **kwargs) -> str:
 
 
 @tool
+def extract_html_elements(query: str, **kwargs) -> str:
+    """페이지 분석 에이전트를 사용하여 특정 요소를 찾고 HTML 요소를 추출하여 반환합니다."""
+    driver = kwargs['driver']
+
+    # 현재 페이지의 HTML 콘텐츠 가져오기
+    html_content = driver.page_source
+
+    # 전역 페이지 분석 에이전트 사용
+    result = page_analyzer.run(query=query, html_content=html_content)
+
+    if result.get("selector") and result.get("extracted_elements"):
+        selector = result["selector"]
+        extracted_elements = result["extracted_elements"]
+
+        response = f"'{query}'에 해당하는 요소를 찾았습니다.\n"
+        response += f"CSS 셀렉터: {selector}\n"
+        response += f"추출된 요소 개수: {len(extracted_elements)}개\n\n"
+
+        # 각 요소의 HTML을 출력
+        for i, element_html in enumerate(extracted_elements, 1):
+            response += f"=== 요소 {i} ===\n"
+            response += element_html
+            response += "\n\n"
+
+        return response
+    else:
+        return f"'{query}'에 해당하는 요소를 찾을 수 없습니다."
+
+
+@tool
 def smart_click(query: str, **kwargs) -> str:
     """페이지 분석 에이전트를 사용하여 요소를 찾고 클릭합니다."""
     driver = kwargs['driver']
 
-    # 페이지 분석 에이전트로 셀렉터 생성
-    analyzer = PageAnalyzer()
-    result = analyzer.run(query=query, html_content=driver.page_source)
+    # 전역 페이지 분석 에이전트로 셀렉터 생성
+    result = page_analyzer.run(query=query, html_content=driver.page_source)
 
     if not result.get("selector"):
         return f"'{query}'에 해당하는 요소를 찾을 수 없습니다."
@@ -118,9 +148,8 @@ def smart_type(query: str, text: str, **kwargs) -> str:
     """페이지 분석 에이전트를 사용하여 입력 필드를 찾고 텍스트를 입력합니다."""
     driver = kwargs['driver']
 
-    # 페이지 분석 에이전트로 셀렉터 생성
-    analyzer = PageAnalyzer()
-    result = analyzer.run(query=query, html_content=driver.page_source)
+    # 전역 페이지 분석 에이전트로 셀렉터 생성
+    result = page_analyzer.run(query=query, html_content=driver.page_source)
 
     if not result.get("selector"):
         return f"'{query}'에 해당하는 입력 필드를 찾을 수 없습니다."
@@ -144,9 +173,8 @@ def press_enter(query: str, **kwargs) -> str:
     from selenium.webdriver.common.keys import Keys
     driver = kwargs['driver']
 
-    # 페이지 분석 에이전트로 셀렉터 생성
-    analyzer = PageAnalyzer()
-    result = analyzer.run(query=query, html_content=driver.page_source)
+    # 전역 페이지 분석 에이전트로 셀렉터 생성
+    result = page_analyzer.run(query=query, html_content=driver.page_source)
 
     if not result.get("selector"):
         return f"'{query}'에 해당하는 입력 필드를 찾을 수 없습니다."
@@ -166,6 +194,9 @@ def press_enter(query: str, **kwargs) -> str:
 # LLM 초기화
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
 # llm = ChatOpenAI(model="gpt-4o", temperature=0)
+
+# PageAnalyzer 인스턴스를 한 번만 생성 (그래프 시각화도 이때 실행됨)
+page_analyzer = PageAnalyzer()
 
 # Selenium 도구들을 LangChain Tool 객체로 래핑합니다.
 
@@ -476,7 +507,7 @@ def get_analysis_status(**kwargs) -> str:
 
 
 tools = [navigate_to_url, click_element, type_text, get_page_content,
-         analyze_page_elements, smart_click, smart_type, press_enter,
+         analyze_page_elements, extract_html_elements, smart_click, smart_type, press_enter,
          analyze_and_execute_instruction, get_execution_plan, execute_plan_step,
          execute_full_plan, get_analysis_status]  # 지시사항 분석 도구들 추가
 
@@ -560,34 +591,25 @@ def run_tools(state: AgentState):
     response = tool_obj.func(**tool_input)
     return {"scratchpad": state["scratchpad"] + [FunctionMessage(content=str(response), name=tool_name_str)]}
 
-# Human-in-the-loop 노드: 사용자 개입을 요청합니다.
+# Human-in-the-loop 노드: 사용자로부터 지시사항을 받습니다.
 
 
 def human_intervention(state: AgentState):
-    print("\n--- Human Intervention Required ---")
-    print("에이전트가 다음 단계를 결정하기 전에 당신의 도움이 필요합니다.")
-    print("현재 상태:")
-    # driver.current_url 대신 state['current_url'] 사용
-    print(f"  URL: {state['current_url']}")
-    print(f"  채팅 기록: {state['chat_history']}")
-    print(f"  스크래치패드: {state['scratchpad']}")
-    print("다음 중 하나를 선택하세요:")
-    print("1. 계속 진행 (continue)")
-    print("2. 새로운 지침 제공 (new instruction)")
-    print("3. 종료 (exit)")
+    print(f"\n현재 URL: {state['current_url']}")
 
-    while True:
-        choice = input("선택: ").strip().lower()
-        if choice == "continue":
-            return {"user_input": "continue"}
-        elif choice == "new instruction":
-            instruction = input("새로운 지침을 입력하세요: ")
-            # 새 지침 추가
-            return {"user_input": "new instruction", "chat_history": state["chat_history"] + [HumanMessage(content=instruction)]}
-        elif choice == "exit":
-            return {"user_input": "exit"}
-        else:
-            print("잘못된 입력입니다. 'continue', 'new instruction', 'exit' 중 하나를 입력하세요.")
+    user_instruction = input("지시사항을 입력하세요 (종료하려면 'exit' 입력): ").strip()
+
+    if user_instruction.lower() == "exit":
+        return {"user_input": "exit"}
+    elif user_instruction:
+        # 새로운 지시사항을 채팅 기록에 추가
+        return {
+            "user_input": "new_instruction",
+            "chat_history": state["chat_history"] + [HumanMessage(content=user_instruction)]
+        }
+    else:
+        # 빈 입력인 경우 다시 입력 요청
+        return human_intervention(state)
 
 
 # 그래프 정의
@@ -600,17 +622,24 @@ graph.add_node("tools", run_tools)  # run_tools 함수 다시 사용
 graph.add_node("human_intervention", human_intervention)
 
 # 에이전트의 초기 진입점을 설정합니다.
-graph.set_entry_point("agent")
+graph.set_entry_point("human_intervention")
 
 # 조건부 에지 함수: 에이전트의 마지막 메시지가 도구 호출인지 확인합니다.
 
 
 def should_continue(state: AgentState):  # should_continue 함수 복원
     last_message = state["scratchpad"][-1]
+
+    # 스크래치패드가 너무 길어지면 human_intervention으로 이동
+    if len(state["scratchpad"]) > 10:
+        print("⚠️ 스크래치패드가 너무 길어졌습니다. 사용자 입력을 기다립니다.")
+        return "human_intervention"
+
+    # 도구 호출이 있으면 도구 실행
     if "function_call" in last_message.additional_kwargs:
         return "tools"
     else:
-        return "human_intervention"  # 또는 'agent'로 돌아갈 수도 있습니다.
+        return "human_intervention"
 
 
 # 에지 추가
@@ -625,23 +654,53 @@ graph.add_edge("tools", "agent")  # 도구 실행 후 다시 에이전트로 돌
 
 
 def should_react_to_human_input(state: AgentState):
-    if state["user_input"] == "continue":
-        return "agent"
-    elif state["user_input"] == "new instruction":
-        instruction = input("새로운 지침을 입력하세요: ")
-        return {"user_input": "new instruction", "chat_history": state["chat_history"] + [HumanMessage(content=instruction)]}
-    elif state["user_input"] == "exit":
-        return END
+    if state["user_input"] == "exit":
+        return "__end__"
+    elif state["user_input"] == "new_instruction":
+        return "agent"  # 새 지시사항으로 에이전트 실행
     else:
-        return "agent"  # 기본적으로 에이전트로 돌아갑니다. (이 부분은 상황에 따라 조정 가능)
+        return "agent"  # 기본적으로 에이전트로 돌아갑니다.
 
 
 graph.add_conditional_edges(
     "human_intervention",
     should_react_to_human_input,
-    {"agent": "agent", "exit": END}
+    {"agent": "agent", "__end__": END}
 )
 
 
 # 그래프 컴파일
 app = graph.compile()
+
+# 비동기 그래프 시각화 함수
+
+
+async def save_graph_visualization():
+    """그래프 시각화를 비동기로 처리합니다."""
+    print("📊 BrowserAgent 그래프 구조 시각화 중...")
+    try:
+        # 비동기로 그래프 생성
+        mermaid_png = await asyncio.to_thread(
+            lambda: app.get_graph(xray=True).draw_mermaid_png(
+                draw_method=MermaidDrawMethod.PYPPETEER)
+        )
+
+        # 파일 저장도 비동기로 처리
+        await asyncio.to_thread(
+            lambda: _save_png_file(mermaid_png)
+        )
+
+        print("✅ BrowserAgent 그래프 시각화 저장: ./sec04/browser_agent_detailed_graph.png")
+    except Exception as e:
+        print(f"⚠️ BrowserAgent 그래프 시각화 실패: {e}")
+
+
+def _save_png_file(mermaid_png):
+    """PNG 파일 저장 헬퍼 함수"""
+    with open("./browser_agent_detailed_graph.png", "wb") as f:
+        f.write(mermaid_png)
+
+
+# 그래프 시각화 실행
+if __name__ == "__main__":
+    asyncio.run(save_graph_visualization())
