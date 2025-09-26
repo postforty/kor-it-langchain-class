@@ -339,6 +339,7 @@ dependencies = [
     { name = "langchain-community" },
     { name = "langchain-google-genai" },
     { name = "langgraph" },
+    { name = "langgraph-supervisor" },
     { name = "pyppeteer" },
     { name = "python-dotenv" },
     { name = "selenium" },
@@ -357,6 +358,7 @@ requires-dist = [
     { name = "langchain-community", specifier = ">=0.3.27" },
     { name = "langchain-google-genai", specifier = ">=2.1.10" },
     { name = "langgraph", specifier = ">=0.6.7" },
+    { name = "langgraph-supervisor", specifier = ">=0.0.29" },
     { name = "pyppeteer", specifier = ">=0.0.25" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "selenium", specifier = ">=4.35.0" },
@@ -1324,6 +1326,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8a/5a/2cba4e530e52666d9999fe240faaf18e92107b2cce26ea7de59b1fe8d487/langgraph_sdk-0.2.8.tar.gz", hash = "sha256:c2f34e174e94220d083e026546d1ebe9c554364f44fa5f4e921ed6041e029078", size = 99190, upload-time = "2025-09-17T17:26:05.614Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fd/0c/f1cc797ef5df239f250524fb1f4d6d105b09d4c1d56b7f372ab2ebb33571/langgraph_sdk-0.2.8-py3-none-any.whl", hash = "sha256:2e15f4f5ae6acf853cd873c3e6eae1c487c3669b9534e83d194f1c232c199ea2", size = 56103, upload-time = "2025-09-17T17:26:04.448Z" },
+]
+
+[[package]]
+name = "langgraph-supervisor"
+version = "0.0.29"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain-core" },
+    { name = "langgraph" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/78/f0/fc8d5b5926caf3becfc75ff399c4b855daaff957f804973942457864ce94/langgraph_supervisor-0.0.29.tar.gz", hash = "sha256:0ab6e06e102096071d605268a4138084b87128f0c965e1544f77a7d4f65ca16b", size = 21095, upload-time = "2025-07-28T14:16:23.079Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/61/15/e3b4ad69b2a5fd6ba3d92bcca92b59ebd3a40f2a55751946728506ba618e/langgraph_supervisor-0.0.29-py3-none-any.whl", hash = "sha256:611dd4545f566f690d30004af3742887ec78134921118706ae7eeb12ce77763d", size = 16039, upload-time = "2025-07-28T14:16:22.259Z" },
 ]
 
 [[package]]
