@@ -32,6 +32,8 @@ uv add geopy
 uv add selenium
 
 uv add pyppeteer
+
+uv add yfinance
 ```
 
 ---
