@@ -303,7 +303,7 @@ requires-dist = [
     { name = "langchain", specifier = ">=0.3.27" },
     { name = "langchain-community", specifier = ">=0.3.27" },
     { name = "langchain-google-genai", specifier = ">=2.1.10" },
-    { name = "langgraph", specifier = ">=0.6.7" },
+    { name = "langgraph", extras = ["draw"], specifier = ">=0.6.7" },
     { name = "pymupdf", specifier = ">=1.26.4" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
 ]

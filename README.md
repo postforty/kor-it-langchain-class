@@ -29,6 +29,7 @@
 5. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
 6. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
 7. Anthropic 프롬프트 엔지니어링: <https://docs.anthropic.com/ko/docs/build-with-claude/prompt-engineering/overview>
+8. 랭체인 허브 프롬프트: <https://smith.langchain.com/hub>
 
 ---
 
