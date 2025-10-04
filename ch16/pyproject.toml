@@ -15,4 +15,7 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "streamlit>=1.49.1",
     "langchain-google-genai>=2.1.9",
+    "langchain-postgres>=0.0.15",
+    "psycopg>=3.2.10",
+    "psycopg-binary>=3.2.10",
 ]
