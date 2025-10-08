@@ -18,4 +18,7 @@ dependencies = [
     "langchain-postgres>=0.0.15",
     "psycopg>=3.2.10",
     "psycopg-binary>=3.2.10",
+    "sentence-transformers>=5.1.1",
+    "langgraph>=0.6.9",
+    "ddgs>=9.6.0",
 ]
