@@ -15,6 +15,14 @@ uv add python-dotenv
 uv add PyMuPDF pypdf langchain langchain_community
 
 uv add faiss-cpu
+
+uv add py-zerox
+
+uv add langchain_postgres
+
+uv add psycopg psycopg-binary
+
+uv add langgraph
 ```
 
 ### 랭체인 구글 제미나이 임베딩
