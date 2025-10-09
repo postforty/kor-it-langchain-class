@@ -23,6 +23,10 @@ uv add langchain_postgres
 uv add psycopg psycopg-binary
 
 uv add langgraph
+
+uv add sentence-transformers
+
+uv add ddgs
 ```
 
 ### 랭체인 구글 제미나이 임베딩
