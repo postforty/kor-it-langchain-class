@@ -41,7 +41,6 @@ LangSmith는 대규모 언어 모델(LLM) 애플리케이션의 **개발, 디버
    LANGSMITH_ENDPOINT=https://api.smith.langchain.com
    LANGSMITH_API_KEY=<your-api-key>
    LANGSMITH_PROJECT=pr-long-king-1
-   OPENAI_API_KEY=<your-openai-api-key>
    ```
 
 > **메모:** 실행 추적(Tracing) 기능은 LangChain, LangGraph, OpenAI 등 주요 LLM 프레임워크에서 LangSmith 연동 설정만 하면 별도 코드 없이 https://smith.langchain.com/ 대시보드에서 자동 활성화된다. SDK 예시 코드는 데이터셋/예시 생성, 평가 자동화 등 고급 기능에 필요하다.

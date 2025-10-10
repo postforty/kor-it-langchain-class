@@ -33,4 +33,18 @@ uv add langchain-google-vertexai
 uv add streamlit
 
 uv add faiss-cpu
+
+uv add py-zerox
+
+uv add langchain_postgres
+
+uv add psycopg psycopg-binary
+
+uv add langgraph
+
+uv add sentence-transformers
+
+uv add ddgs
+
+uv add langchain_postgres
 ```

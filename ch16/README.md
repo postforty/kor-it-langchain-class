@@ -9,7 +9,6 @@ uv add jupyter jupyterlab ipykernel
 # langchain-google-genai
 uv add langchain-google-genai
 
-# python-dotenv
 uv add python-dotenv
 
 uv add PyMuPDF pypdf langchain langchain_community
