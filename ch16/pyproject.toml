@@ -21,4 +21,5 @@ dependencies = [
     "sentence-transformers>=5.1.1",
     "langgraph>=0.6.9",
     "ddgs>=9.6.0",
+    "py-zerox>=0.0.7",
 ]
