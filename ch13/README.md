@@ -27,6 +27,9 @@ uv add langgraph
 uv add sentence-transformers
 
 uv add ddgs
+
+# Kanana Safeguard
+uv add torch transformers accelerate bitsandbytes
 ```
 
 ### 랭체인 구글 제미나이 임베딩
