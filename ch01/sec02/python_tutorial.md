@@ -191,12 +191,13 @@ finally:
 ```python
 # 리스트 컴프리헨션
 numbers = [1, 2, 3, 4, 5]
-squares = [num * num for num in numbers if num % 2 == 0]
-print(f"짝수의 제곱: {squares}") # [4, 16]
+result = [num * num for num in numbers if num % 2 == 0]
+print(f"짝수의 제곱: {result}") # [4, 16]
 
 # 딕셔너리 컴프리헨션
 keys = ["name", "age", "city"]
 values = ["김일남", 99, "부산"]
+result = zip(keys, values)
 person_dict = {k: v for k, v in zip(keys, values)}
 print(f"사람 딕셔너리: {person_dict}") # {'name': '김일남', 'age': '99', 'city': '부산'}
 ```
@@ -216,6 +217,7 @@ print(f"사람 딕셔너리: {person_dict}") # {'name': '김일남', 'age': '99'
 ```python
 name = "김일남"
 age = 99
+message = "이름: " + name + ", 나이: " + str(age)
 message = f"이름: {name}, 나이: {age}"
 print(message)
 ```
@@ -367,7 +369,7 @@ asyncio.run(main())
 
 #### 14. Pydantic (데이터 유효성 검사 및 설정 관리)
 
-**설명**: 데이터 유효성 검사, 설정 관리, 직렬화/역직렬화 기능을 제공하는 라이브러리이다. 클래스 기반으로 데이터 스키마를 정의할 수 있게 해준다.
+**설명**: 데이터 유효성 검사, 설정 관리, 직렬화/역직렬화 기능을 제공하는 라이브러리이다. 클래스 기반으로 데이터 스키마(schema)를 정의할 수 있게 해준다.
 
 **예제**:
 
@@ -392,7 +394,7 @@ except Exception as e:
 **Pydantic Field 유효성 검사 매개변수**:
 
 - `gt` (greater than): 지정된 값보다 큰 값
-- `ge` (greater than or equal): 지정된 값보다 크거나 같은 값  
+- `ge` (greater than or equal): 지정된 값보다 크거나 같은 값
 - `lt` (less than): 지정된 값보다 작은 값
 - `le` (less than or equal): 지정된 값보다 작거나 같은 값
 - `min_length`: 문자열이나 리스트의 최소 길이
@@ -419,6 +421,17 @@ class Product(BaseModel):
 **설명**: 시퀀스의 모든 요소를 한꺼번에 메모리에 생성하지 않고, 필요할 때마다 하나씩 생성하여 반환하는 이터레이터(iterator)를 만드는 함수이다. `yield` 키워드를 사용한다. 메모리 효율적이며 스트리밍 처리에 유용하다.
 
 **예제**:
+
+```python
+def test_generator():
+    yield 1
+    yield 2
+    yield 3
+
+gen = test_generator()
+
+next(gen)
+```
 
 ```python
 import sys

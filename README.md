@@ -152,7 +152,7 @@
 #### Section 07-01
 
 - 챗봇을 위한 시계와 주가 검색 능력 만들기
-- 펑션 콜링(Function Calling)으로 챗봇이 외부 도구를 사용하는 방법 배우기
+- 툴 콜링(Tool Calling)으로 챗봇이 외부 도구를 사용하는 방법 배우기
 
 #### Section 07-02
 
@@ -291,6 +291,7 @@ uv run python --version
 
 - **레포 클론 및 .env 준비**
   - 저장소를 클론하고 루트 위치에 `.env` 파일을 만든다.
+  - `.env`는 `.gitignore`에 추가하여 외부에 노출되지 않도록 한다.
 
 ```env
 GEMINI_API_KEY=여기에_본인_API_키
