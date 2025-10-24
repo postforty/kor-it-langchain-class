@@ -18,7 +18,7 @@
 
 - **개발 OS**: Windows 10 이상
 - **개발 도구(IDE)**: Visual Studio Code, Jupyter Notebook, Google Colab
-- **기타(프레임워크)**: LangChain, LangGraph, LangSmith, Ollama, Streamlit, Github, Docker
+- **기타(프레임워크)**: LangChain, LangGraph, LangSmith, Ollama, Streamlit, Gradio, Github, Docker
 
 ### 참고
 
@@ -97,11 +97,11 @@
 
 #### Section 04-02
 
-- 챗봇과 끝말 잊기 게임하기
+- 챗봇과 끝말 잊기 게임하기 (Gradio)
 
 #### Section 04-03
 
-- 나만의 LangChain 챗봇 만들기
+- 나만의 LangChain 챗봇 만들기 (Streamlit)
 
 ---
 

@@ -20,6 +20,8 @@
 
 ### 2-1. UV 설치
 
+> [uv 공식 문서](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer) 참고
+
 - **macOS 및 Linux 설치**
 
   ```bash
@@ -267,6 +269,4 @@ Remove-Item -Recurse -Force "$HOME\.uv\tool"
   Remove-Item $HOME\.local\bin\uvw.exe
   ```
 
----
-
-자세한 내용은 [uv 공식 문서](https://docs.astral.sh/uv/getting-started/installation/#shell-autocompletion) 참고
+> [uv 공식 문서](https://docs.astral.sh/uv/getting-started/installation/#shell-autocompletion) 참고
