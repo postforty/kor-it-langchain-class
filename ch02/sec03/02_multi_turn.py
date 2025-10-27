@@ -12,12 +12,15 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=gemini_api_key)
 
+# 출처:
+# https://github.com/google-gemini/cookbook
+# quickstarts/Get_started.ipynb
 chat = client.chats.create(model="gemini-2.5-flash")
 
 while True:
     user_input = input("사용자: ")  # 사용자 입력 받기
 
-    if user_input == "exit":  # 사용자가 대화를 종료하려는지 확인
+    if user_input == "종료":  # 사용자가 대화를 종료하려는지 확인
         break
 
     response = chat.send_message(
