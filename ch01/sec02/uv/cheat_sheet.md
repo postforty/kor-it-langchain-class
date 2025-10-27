@@ -264,9 +264,9 @@ Remove-Item -Recurse -Force "$HOME\.uv\tool"
   ```
 - Windows PowerShell:
   ```pwsh
-  Remove-Item $HOME\.local\bin\uv.exe
-  Remove-Item $HOME\.local\bin\uvx.exe
-  Remove-Item $HOME\.local\bin\uvw.exe
+  rm $HOME\.local\bin\uv.exe
+  rm $HOME\.local\bin\uvx.exe
+  rm $HOME\.local\bin\uvw.exe
   ```
 
 > [uv 공식 문서](https://docs.astral.sh/uv/getting-started/installation/#shell-autocompletion) 참고
