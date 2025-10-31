@@ -1,7 +1,11 @@
 # * 랭체인 적용
 # * user, assistant 모두 동일 대화 출력
 import streamlit as st
-from langchain_core.messages.chat import ChatMessage  # 추가
+
+# 마치 카카오톡 메시지 하나와 같다고 생각하면 됨
+# 메시지 내용(content): 카톡의 글 내용
+# 발신자(role): 이 메시지를 누가 보냈는지? (HUMAN, AI, SYSTEM)
+from langchain_core.messages.chat import ChatMessage  # * 추가
 
 st.title("나만의 LangChain 챗봇 만들기")
 

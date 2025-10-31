@@ -4,8 +4,6 @@ from langchain_core.messages.chat import ChatMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
-from langchain import hub  # 추가
-from langchain_core.prompts import load_prompt  # 추가
 
 import os
 from dotenv import load_dotenv
@@ -21,12 +19,12 @@ if "messages" not in st.session_state:
 with st.sidebar:
     clear_btn = st.button("초기화")
 
-    # 추가
+    # * 추가
     selected_prompt = st.selectbox(
         "언어를 선택해 주세요", ("Korean", "English"), index=0
     )
 
-print(selected_prompt)
+# print(selected_prompt)
 
 
 def print_messages():
@@ -78,6 +76,8 @@ if user_input:
     add_message("user", user_input)
 
     chain = create_chain()
+    
+    # * 타이핑하듯이 답변 출력
     response = chain.stream({"question": st.session_state.messages})
 
     with st.chat_message("assistant"):
@@ -90,7 +90,6 @@ if user_input:
             container.markdown(ai_answer)
 
     # 대화 내용에 추가되는 부분
-    add_message("user", user_input)
     add_message("assistant", ai_answer)
 
 print(st.session_state["messages"])
