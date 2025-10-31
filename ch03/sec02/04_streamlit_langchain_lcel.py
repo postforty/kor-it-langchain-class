@@ -1,13 +1,12 @@
 # 랭체인과 LCEL 적용한 예제
-# 메모리 기능 없음
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage
-from langchain_core.prompts import ChatPromptTemplate  # 추가
-from langchain_google_genai import ChatGoogleGenerativeAI  # 추가
-from langchain_core.output_parsers import StrOutputParser  # 추가
-import os  # 추가
-from dotenv import load_dotenv  # 추가
-load_dotenv()  # 추가
+from langchain_core.prompts import ChatPromptTemplate  # * 추가
+from langchain_google_genai import ChatGoogleGenerativeAI  # * 추가
+from langchain_core.output_parsers import StrOutputParser  # * 추가
+import os  # * 추가
+from dotenv import load_dotenv  # * 추가
+load_dotenv()  # * 추가
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
@@ -16,18 +15,21 @@ st.title("나만의 LangChain 챗봇 만들기")
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
-with st.sidebar:  # 추가
+with st.sidebar:  # * 추가
     clear_btn = st.button("초기화")
+
 
 def print_messages():
     for chat_message in st.session_state["messages"]:
         st.chat_message(chat_message.role).write(chat_message.content)
 
+
 def add_message(role, message):
     st.session_state["messages"].append(
         ChatMessage(role=role, content=message))
 
-def create_chain():  # 체인
+
+def create_chain():  # * 체인
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", "당신은 친절한 AI 어시스턴트입니다."),

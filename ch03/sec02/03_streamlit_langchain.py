@@ -1,5 +1,5 @@
-# 랭체인 적용
-# user, assistant 모두 동일 대화 출력
+# * 랭체인 적용
+# * user, assistant 모두 동일 대화 출력
 import streamlit as st
 from langchain_core.messages.chat import ChatMessage  # 추가
 
@@ -14,7 +14,7 @@ def print_messages():  # 모든 메시지 출력
         st.chat_message(chat_message.role).write(chat_message.content)
 
 
-def add_message(role, message):  # 메시지 저장
+def add_message(role, message):  # * 메시지 저장
     st.session_state["messages"].append(
         ChatMessage(role=role, content=message))
 
