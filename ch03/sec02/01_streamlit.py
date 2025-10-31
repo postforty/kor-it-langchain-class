@@ -6,7 +6,8 @@ import streamlit as st
 
 st.title("나만의 챗봇 만들기")
 
-# 처음 한 번만 session_state 생성
+# 스트림릿에서 관리하는 대화 내용(세션 상태)을 저장하는 리스트
+# 처음 한 번만 session_state 생성하기 위한 조건문 (스트림릿은 대화가 추가될 때마다 새로고침됨)
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
@@ -22,6 +23,7 @@ if user_input:
     st.chat_message("user").write(user_input)
     st.chat_message("assistant").write(user_input)
 
+    # 대화 내용을 세션 상태에 저장
     st.session_state["messages"].append(("user", user_input))
     st.session_state["messages"].append(("assistant", user_input))
 
