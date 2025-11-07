@@ -12,7 +12,7 @@ client = genai.Client(api_key=gemini_api_key)
 # * - Streamlit에서 애플리케이션의 상태를 관리하는 데 사용되는 딕셔너리
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = client.chats.create(
-        model="gemini-2.5-flash")  # * 새로운 채팅 세션을 생성 (대화의 연속성 유지)
+        model="gemini-2.5-flash")  # * 새로운 채팅 세션을 생성 (세션 객체는 연속적인 대화를 관리하도록 설계 -> 대화의 연속성 유지)
 
 st.title("나만의 LLM 챗봇 만들기")
 

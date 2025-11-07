@@ -1,6 +1,6 @@
 # 랭체인과 LCEL 적용한 예제
 import streamlit as st
-from langchain_core.messages import HumanMessage, AIMessage # * 추가
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage # * 수정
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder  # * 추가
 from langchain_google_genai import ChatGoogleGenerativeAI  # * 추가
 from langchain_core.output_parsers import StrOutputParser  # * 추가
@@ -43,9 +43,10 @@ def add_message(role, message):
 def create_chain():  # * 체인
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", "당신은 친절하고 도움이 되는 AI 어시스턴트입니다."),
+            SystemMessage("당신은 친절하고 도움이 되는 AI 어시스턴트입니다."),
             # * 수정: 대화 기록(st.session_state.messages) 전체를 여기에 삽입합니다.
-            MessagesPlaceholder(variable_name="messages"),
+            MessagesPlaceholder(variable_name="messages"), # 대화의 연속성 유지
+            HumanMessage("#Question:\n{question}"),
         ]
     )
     llm = ChatGoogleGenerativeAI(
@@ -76,7 +77,10 @@ if user_input:  # 수정
     # 3. 모델 호출: MessagesPlaceholder가 받는 키인 "messages"에 전체 대화 기록을 넘깁니다.
     #    (이 리스트에는 방금 add_message로 추가된 새로운 HumanMessage도 포함되어 있습니다.)
     response = chain.invoke(
-        {"messages": st.session_state.messages}
+        {
+            "question": user_input, 
+            "messages": st.session_state.messages
+        }
     )
 
     # 4. 모델 응답을 화면에 출력

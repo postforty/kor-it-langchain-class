@@ -1,5 +1,5 @@
 # * 랭체인 적용
-# * user, assistant 모두 동일 대화 출력
+# * 이 예제는 user, assistant 모두 동일 대화 출력함
 import streamlit as st
 
 # 마치 카카오톡 메시지 하나와 같다고 생각하면 됨

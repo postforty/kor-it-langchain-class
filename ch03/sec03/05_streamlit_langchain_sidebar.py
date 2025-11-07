@@ -1,6 +1,6 @@
 # 셀렉트 모드 변경시 즉시 언어가 반영되도록 개선함
 import streamlit as st
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
@@ -29,29 +29,43 @@ with st.sidebar:
 
 
 def print_messages():
-    for chat_message in st.session_state["messages"]:
-        st.chat_message(chat_message.role).write(chat_message.content)
+    for lang_message in st.session_state["messages"]:
+        # LangChain 메시지 객체의 .type 속성(human, ai 등)을 Streamlit 역할(user, assistant)로 매핑합니다.
+        st_role = "user" if lang_message.type == "human" else "assistant"
+        st.chat_message(st_role).write(lang_message.content)
 
 
 def add_message(role, message):
-    st.session_state["messages"].append(
-        ChatMessage(role=role, content=message))
+    # 역할 문자열에 따라 적절한 LangChain 메시지 객체를 생성하여 저장합니다.
+    if role == "user":
+        msg_obj = HumanMessage(content=message)
+    elif role == "assistant":
+        msg_obj = AIMessage(content=message)
+    else:
+        return
+        
+    st.session_state["messages"].append(msg_obj)
 
 
 def create_chain():
     if selected_prompt == "Korean":
         prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "당신은 한국어로 대답하는 친절한 AI 어시스턴트입니다."),
-                ("user", "#Question:\n{question}"),
+                # ("system", "당신은 한국어로 대답하는 친절한 AI 어시스턴트입니다."),
+                # ("user", "#Question:\n{question}"),
+                SystemMessage("당신은 한국어로 대답하는 친절한 AI 어시스턴트입니다."), # * 수정
+                # 수정: 대화 기록(st.session_state.messages) 전체를 여기에 삽입합니다.
+                MessagesPlaceholder(variable_name="messages"), # 대화의 연속성 유지
+                HumanMessage("#Question:\n{question}"),
             ]
         )
 
     if selected_prompt == "English":
         prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "You are a friendly AI assistant who answers in English. Please make sure to answer English questions in English."),
-                ("user", "#Question:\n{question}"),
+                SystemMessage("You are a friendly AI assistant who answers in English. Please make sure to answer English questions in English."),
+                MessagesPlaceholder(variable_name="messages"), # 대화의 연속성 유지
+                HumanMessage("#Question:\n{question}"),
             ]
         )
 
@@ -79,7 +93,12 @@ if user_input:
     chain = create_chain()
     
     # * 타이핑하듯이 답변 출력
-    response = chain.stream({"question": st.session_state.messages})
+    response = chain.stream(
+        {
+            "question": user_input, 
+            "messages": st.session_state.messages
+        }
+    )
 
     with st.chat_message("assistant"):
         container = st.empty()
