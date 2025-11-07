@@ -1,7 +1,7 @@
 # 셀렉트 모드 변경시 즉시 언어가 반영되도록 개선함
 import streamlit as st
-from langchain_core.messages.chat import ChatMessage
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
 
@@ -14,6 +14,7 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 st.title("나만의 LangChain 챗봇 만들기")
 
 if "messages" not in st.session_state:
+    # 세션 상태에는 LangChain 메시지 객체(HumanMessage, AIMessage)들이 저장됩니다.
     st.session_state["messages"] = []
 
 with st.sidebar:
