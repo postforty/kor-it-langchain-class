@@ -5,8 +5,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-client = genai.Client(api_key=gemini_api_key)
+# ====================================================================
+# gemini 모델 연동
+# genai.Client 객체를 st.cache_resource로 캐싱하여 안정적으로 관리합니다. (핵심 수정)
+@st.cache_resource
+def get_gemini_client():
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    return genai.Client(api_key=gemini_api_key)
+
+client = get_gemini_client()
+# ====================================================================
 
 # * st.session_state
 # * - Streamlit에서 애플리케이션의 상태를 관리하는 데 사용되는 딕셔너리
