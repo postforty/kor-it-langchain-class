@@ -46,7 +46,6 @@ def create_chain():  # * 체인
             SystemMessage("당신은 친절하고 도움이 되는 AI 어시스턴트입니다."),
             # * 수정: 대화 기록(st.session_state.messages) 전체를 여기에 삽입합니다.
             MessagesPlaceholder(variable_name="messages"), # 대화의 연속성 유지
-            HumanMessage("#Question:\n{question}"),
         ]
     )
     llm = ChatGoogleGenerativeAI(
@@ -78,7 +77,6 @@ if user_input:  # 수정
     #    (이 리스트에는 방금 add_message로 추가된 새로운 HumanMessage도 포함되어 있습니다.)
     response = chain.invoke(
         {
-            "question": user_input, 
             "messages": st.session_state.messages
         }
     )
