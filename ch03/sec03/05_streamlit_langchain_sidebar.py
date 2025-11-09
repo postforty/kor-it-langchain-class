@@ -56,16 +56,14 @@ def create_chain():
                 SystemMessage("당신은 한국어로 대답하는 친절한 AI 어시스턴트입니다."), # * 수정
                 # 수정: 대화 기록(st.session_state.messages) 전체를 여기에 삽입합니다.
                 MessagesPlaceholder(variable_name="messages"), # 대화의 연속성 유지
-                HumanMessage("#Question:\n{question}"),
             ]
         )
 
     if selected_prompt == "English":
         prompt = ChatPromptTemplate.from_messages(
             [
-                SystemMessage("You are a friendly AI assistant who answers in English. Please make sure to answer English questions in English."),
+                SystemMessage("당신은 영어로 대답하는 친절한 AI 어시스턴트입니다. 답변은 반드시 영어로 해야합니다."),
                 MessagesPlaceholder(variable_name="messages"), # 대화의 연속성 유지
-                HumanMessage("#Question:\n{question}"),
             ]
         )
 
@@ -95,7 +93,6 @@ if user_input:
     # * 타이핑하듯이 답변 출력
     response = chain.stream(
         {
-            "question": user_input, 
             "messages": st.session_state.messages
         }
     )
