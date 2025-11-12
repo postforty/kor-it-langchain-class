@@ -15,6 +15,9 @@ uv add python-dotenv
 uv add PyMuPDF pypdf langchain langchain_community
 
 uv add faiss-cpu
+
+# gemini API
+uv add google-genai
 ```
 
 ### 랭체인 구글 제미나이 임베딩
