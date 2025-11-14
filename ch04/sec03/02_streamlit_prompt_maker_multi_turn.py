@@ -16,6 +16,7 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 
 st.title("나만의 LangChain 챗봇")
 
+# 화면에 표시될 메시지 내용 관리
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
@@ -39,8 +40,8 @@ def clear_task():
     """
     st.session_state["messages"] = []
     st.session_state["task_input"] = ""
-    if "any" in chat_histories:
-        del chat_histories["any"]
+    if "any" in st.session_state.chat_histories:
+        del st.session_state.chat_histories["any"]
 
 
 with st.sidebar:
@@ -106,15 +107,18 @@ def create_chain(prompt_filepath, task=""):
 
 
 # 세션별 채팅 히스토리 관리
-chat_histories = {}
+if "chat_histories" not in st.session_state:
+    st.session_state.chat_histories = {} # Streamlit 세션 상태에 저장
+
+print("st.session_state.messages:", st.session_state.messages)
+print("st.session_state.chat_histories:", st.session_state.chat_histories)
 
 # 세션 ID에 따라 대화 기록을 가져오는 함수
 
-
 def get_session_history(session_id: str):
-    if session_id not in chat_histories:
-        chat_histories[session_id] = ChatMessageHistory()
-    return chat_histories[session_id]
+    if session_id not in st.session_state.chat_histories:
+        st.session_state.chat_histories[session_id] = ChatMessageHistory()
+    return st.session_state.chat_histories[session_id]
 
 
 # 프롬프트나 TASK가 변경되었을 경우에만 runnable을 새로 생성
@@ -162,4 +166,7 @@ print("st.session_state.messages:", st.session_state.messages)
 # [테스트]
 # 프롬프트를 선택해 주세요: prompt-maker.yaml 선택
 # TASK 입력: 블러그 글 작성
-# 입력 프롬프트: 랭체인이라는 주제로 글을 작성해 주세요
+# 입력 프롬프트: 
+# 랭체인이라는 주제로 글을 작성해 주세요.
+# 생성한 프롬프트를 이용해서 블로그 글을 작성해 주세요.
+# 생성된 블러그 글을 요약해 주세요.
