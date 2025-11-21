@@ -19,7 +19,7 @@ load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
-st.title("PDF 기반 QA봇")
+st.title("📄PDF 기반 QA봇")
 st.caption("gemini-embedding-001 + Gemini-2.5-FLASH") # * 캡션 추가
 
 if not os.path.exists(".cache"):  # * 폴더 앞에 .을 붙이면 숨김 처리함(Linux, macOS)을 의미
@@ -29,7 +29,7 @@ if not os.path.exists(".cache"):  # * 폴더 앞에 .을 붙이면 숨김 처리
         os.system('attrib +h .cache')
 
 if not os.path.exists(".cache/files"):
-    os.makedirs(".cache/files") 
+    os.makedirs(".cache/files")
 
 if not os.path.exists(".cache/embeddings"):
     os.mkdir(".cache/embeddings")

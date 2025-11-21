@@ -10,7 +10,7 @@ load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
-st.title("PDF 기반 QA")
+st.title("📄PDF 기반 QA")
 
 if not os.path.exists(".cache"): # * 폴더 앞에 .을 붙이면 숨김 처리함(Linux, macOS)을 의미
     os.mkdir(".cache")
