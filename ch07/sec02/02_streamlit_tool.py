@@ -3,8 +3,8 @@ from langchain_core.messages import HumanMessage, AIMessage # * 수정
 from langchain_core.prompts import ChatPromptTemplate 
 from langchain_google_genai import ChatGoogleGenerativeAI 
 
-from langchain.agents import AgentExecutor, create_tool_calling_agent # * 추가
-from langchain_core.tools import tool # * 추가
+from langchain.tools import tool # * 추가
+from langchain.agents import create_agent # * 추가
 from datetime import datetime # * 추가
 from zoneinfo import ZoneInfo # * 추가
 from pydantic import BaseModel, Field # * 추가
@@ -18,11 +18,11 @@ load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
-llm = ChatGoogleGenerativeAI(
+model = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash", google_api_key=gemini_api_key)
 
-st.title("도구 호출 챗봇")
-st.caption("시계 + 주가 검색 도구 장착!") # 캡션 추가
+st.title("🛠️도구 호출 챗봇")
+st.caption("⏰시계 + 📉주가 검색 도구 장착!")
 
 # * 시계 도구 추가
 @tool # @tool 데코레이터를 사용하여 함수를 도구로 등록
@@ -31,7 +31,7 @@ def get_current_time(timezone: str, location: str) -> str:
 
     Args:
         timezone (str): 타임존 (예: 'Asia/Seoul') 실제 존재하는 타임존이어야 함
-        location (str): 지역명. 타임존이 모든 지명에 대응되지 않기 때문에 이후 llm 답변 생성에 사용됨
+        location (str): 지역명. 타임존이 모든 지명에 대응되지 않기 때문에 이후 model 답변 생성에 사용됨
     """
     target_timezone = ZoneInfo(timezone)
     now = datetime.now(target_timezone).strftime("%Y-%m-%d %H:%M:%S")
@@ -54,7 +54,6 @@ def get_yf_stock_history(stock_history_input: StockHistoryInput) -> str:
 
     return history_md
 
-# * 덕덕고 웹검색 도구 추가
 @tool
 def get_web_search(query: str, search_period: str='w') -> str:
     """
@@ -95,12 +94,6 @@ if "messages" not in st.session_state:
 with st.sidebar:  
     clear_btn = st.button("초기화")
 
-# 싱글턴 관련
-# def print_messages():
-#     for chat_message in st.session_state["messages"]:
-#         st.chat_message(chat_message.role).write(chat_message.content)
-
-# * 멀티턴 관련
 def print_messages():
     for chat_message in st.session_state["messages"]:
         if isinstance(chat_message, HumanMessage):
@@ -111,82 +104,53 @@ def print_messages():
                 st.write(chat_message.content)
 
 def add_message(role, message):
-    # 싱글턴 관련
-    # st.session_state["messages"].append(
-    #     ChatMessage(role=role, content=message))
-
-    # * 멀티턴 관련
     if role == "user":
         st.session_state["messages"].append(HumanMessage(content=message))
     elif role == "assistant":
         st.session_state["messages"].append(AIMessage(content=message))
     
 def create_chain():
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash", google_api_key=gemini_api_key)
-
     # * 도구 바인딩
     tools = [get_current_time, get_yf_stock_history, get_web_search]
 
-    # * 에이전트 프롬프트 정의
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "너는 사용자의 질문에 답변을 하기 위해 tools를 사용할 수 있다."),
-        ("placeholder", "{chat_history}"), # * 멀티턴
-        ("human", "{question}"), # * input를 question으로 수정
-        # AgentExecutor는 agent_scratchpad를 자동으로 채워 넣어,
-        # 에이전트가 이전 단계의 행동과 결과를 기억하고 다음 행동을 결정할 수 있도록 함
-        ("placeholder", "{agent_scratchpad}"),
-    ])
-
-    # * 에이전트 생성
-    agent = create_tool_calling_agent(llm, tools, prompt)
-
-    # * AgentExecutor 초기화
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-    
-    return agent_executor # * 수정
+    # * 에이전트 생성 및 반환
+    return create_agent(model="google_genai:gemini-2.5-flash", tools=tools)
 
 if clear_btn:
     st.session_state["messages"] = []
 
 print_messages()
 
-user_input = st.chat_input("시간 또는 주식 등에 대해 물어 보세요!")
-
-if user_input:
+if user_input := st.chat_input("시간 또는 주식 등에 대해 물어 보세요!"):
     st.chat_message("user").write(user_input)
     add_message("user", user_input)  # st.session_state.messages에 사용자 입력값 추가
 
     chain = create_chain()
 
-    # 싱글턴 관련
-    # ai_answer = chain.invoke({"question": user_input}) 
+    # invoke 한번에 출력
+    ai_answer = chain.invoke(
+        {"messages": [{"role": "user", "content": user_input}]}
+    )
+    
+    # AI 답변 내용 추출 (문자열 또는 리스트 형태 처리)
+    last_message = ai_answer["messages"][-1]
+    ai_content = ""
+    
+    if isinstance(last_message.content, str):
+        ai_content = last_message.content
+    elif isinstance(last_message.content, list):
+        for content_part in last_message.content:
+            if isinstance(content_part, dict) and content_part.get("type") == "text":
+                ai_content += content_part.get("text", "")
+            elif isinstance(content_part, str):
+                ai_content += content_part
 
-    # * 멀티턴 관련
-    ai_answer = chain.invoke({
-        "question": user_input,
-        "chat_history": st.session_state["messages"]
-    })
-    st.chat_message("assistant").write(ai_answer['output']) # * 수정: 'output' 키의 값을 추출
+    print("ai_answer:", ai_answer["messages"])
+    st.chat_message("assistant").write(ai_content) 
 
-    # 타이핑하듯이 답변 출력
-    # ai_answer = chain.stream(
-    #     {"question": user_input})
-    # with st.chat_message("assistant"):
-    #     container = st.empty()  # 페이지 전체를 다시 로드하지 않고도 콘텐츠를 동적으로 업데이트하는 빈 컨테이너 생성
-    # ai_answer = ""
-    # for token in response:  # response는 generator
-    #     if isinstance(token, dict) and "output" in token:
-    #         ai_answer += token["output"]
-    #     elif isinstance(token, str):
-    #         ai_answer += token
-    #     container.markdown(ai_answer)
-
-    add_message("assistant", ai_answer['output']) # * 수정: 'output' 키의 값을 추출
-
-print(st.session_state["messages"])
+    add_message("assistant", ai_content)
 
 # [질문 예시]
 # 부산은 지금 몇시야?
 # 테슬라(TSLA)는 한달 전에 비해 주가가 올랐나 내렸나?
-# 2025년 KT 소액 결제 사건의 원인은?
+# 현재 박스오피스 1위 영화는?

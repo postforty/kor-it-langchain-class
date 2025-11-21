@@ -11,14 +11,14 @@ load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
-llm = ChatGoogleGenerativeAI(
+model = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash", google_api_key=gemini_api_key)
 
-# print(llm.invoke([HumanMessage("부산은 지금 몇시야?")]))
-# print(llm.invoke([HumanMessage("테슬라는 한달 전에 비해 주가가 올랐나 내렸나?")]))
+# print(model.invoke([HumanMessage("부산은 지금 몇시야?")]))
+# print(model.invoke([HumanMessage("테슬라는 한달 전에 비해 주가가 올랐나 내렸나?")]))
 
-st.title("도구 호출 챗봇")
-st.caption("시계 + 주가 검색 도구 장착!") # * 캡션 추가
+st.title("🛠️도구 호출 챗봇")
+st.caption("⏰시계 + 📉주가 검색 도구 장착!")
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
@@ -41,11 +41,11 @@ def create_chain():
             ("user", "#Question:\n{question}"),
         ]
     )
-    llm = ChatGoogleGenerativeAI(
+    model = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash", google_api_key=gemini_api_key)
     output_parsers = StrOutputParser()
 
-    chain = prompt | llm | output_parsers
+    chain = prompt | model | output_parsers
 
     return chain
 
