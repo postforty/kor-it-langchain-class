@@ -1,18 +1,18 @@
 import streamlit as st
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings  # [추가] FAISS 임베딩을 위한 임포트
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS  # [추가] 벡터 스토어 임포트
+from langchain_text_splitters import RecursiveCharacterTextSplitter  # [추가] 텍스트 분할을 위한 임포트
 import tempfile
 import os
 import json
 import random
 import re
-import shutil
+import shutil  # [추가] 폴더 삭제를 위한 임포트
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -35,6 +35,7 @@ if "is_retest" not in st.session_state:
 chat = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash")
 
+# ==================== [추가] FAISS 벡터 스토어 초기화 ====================
 # Langchain 모델 및 FAISS DB 초기화
 embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", 
     transport='rest' # Streamlit의 동기적인 환경과 호환되도록 설정(GoogleGenerativeAIEmbeddings는 기본값은 비동기)
@@ -54,18 +55,22 @@ def get_vector_store():
     return None
 
 st.session_state.vector_store = get_vector_store()
+# ========================================================================
 
 # --- 함수 정의 ---
-def load_and_embed_pdf(pdf_path):
-    """PDF 파일을 로드하고 FAISS에 임베딩합니다."""
-    loader = UnstructuredFileLoader(pdf_path)
+# ==================== [수정] PDF/HTML 로드 및 FAISS 임베딩 함수 ====================
+def load_and_embed_pdf(file_path):
+    """PDF 또는 HTML 파일을 로드하고 FAISS에 임베딩합니다."""
+    loader = UnstructuredFileLoader(file_path)
     docs = loader.load()
     
     if not docs:
-        st.error("PDF에서 텍스트를 추출할 수 없습니다. 파일이 유효한지 확인해주세요.")
+        st.error("파일에서 텍스트를 추출할 수 없습니다. 파일이 유효한지 확인해주세요.")
         return []
 
-    # 텍스트 스플리터를 사용해 문서를 청크로 나눔
+    print(docs)
+
+    # [추가] 텍스트 스플리터를 사용해 문서를 청크로 나눔
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     split_docs = text_splitter.split_documents(docs)
 
@@ -73,7 +78,7 @@ def load_and_embed_pdf(pdf_path):
         st.error("추출된 텍스트가 너무 짧거나 유효하지 않아 문제를 생성할 수 없습니다.")
         return []
     
-    # FAISS에 임베딩 및 저장
+    # [추가] FAISS에 임베딩 및 저장
     if st.session_state.vector_store:
         # DB가 존재하면 기존 DB에 문서 추가
         st.session_state.vector_store.add_documents(split_docs)
@@ -87,12 +92,15 @@ def load_and_embed_pdf(pdf_path):
     st.info(f"성공적으로 처리된 문서 청크 수: {len(split_docs)}개")
     
     return [doc.page_content for doc in split_docs]
+# ============================================================================
 
 
+
+# ==================== [수정] FAISS 벡터 스토어를 활용한 질문 생성 ====================
 def question_generator():
     """세션 상태에 저장된 PDF 문맥을 사용하여 질문을 생성합니다."""
     
-    # FAISS DB에 의미 있는 문서가 있는지 확인
+    # [추가] FAISS DB에 의미 있는 문서가 있는지 확인
     if not st.session_state.vector_store:
         return None
     docs = st.session_state.vector_store.similarity_search("documents", k=1)
@@ -105,7 +113,7 @@ def question_generator():
     else:
         st.session_state.is_retest = False
         
-        # 문제 생성용 컨텍스트 선택
+        # [추가] 문제 생성용 컨텍스트 선택 - FAISS 벡터 스토어에서 검색
         if st.session_state.get("latest_pdf_content") and random.random() < 0.5:
             pdf_context = st.session_state.get("latest_pdf_content")
         else:
@@ -154,6 +162,7 @@ def question_generator():
         except json.JSONDecodeError as e:
             st.error("JSON 파싱 오류가 발생했습니다. 다시 시도해주세요.")
             return None
+# ============================================================================
 
 
 def display_question(q_data):
@@ -260,6 +269,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ==================== [추가] FAISS DB 존재 시 자동 문제 출제 ====================
 # FAISS DB가 존재하고, 아직 PDF가 처리되지 않았다면(첫 실행), 문제 출제
 if st.session_state.vector_store and not st.session_state.pdf_processed:
     try:
@@ -276,19 +286,20 @@ if st.session_state.vector_store and not st.session_state.pdf_processed:
     except Exception as e:
         st.error(f"문제 생성 중 오류가 발생했습니다: {e}")
         st.info("새로운 PDF를 업로드하여 다시 시도하거나, 'faiss_index' 폴더를 삭제하고 다시 실행해주세요.")
+# ============================================================================
 
-# --- PDF 업로드 및 처리 ---
+# --- PDF/HTML 업로드 및 처리 ---
 pdf_file = st.file_uploader(
-    "Upload a PDF", type=["pdf", "html"], label_visibility="collapsed")
+    "Upload a PDF or HTML", type=["pdf", "html"], label_visibility="collapsed")
 submit_button = st.button("제출", type="primary")
 
-# PDF 제출 버튼 클릭 시 동작
+# 파일 제출 버튼 클릭 시 동작
 if submit_button and pdf_file is not None:
-    # 기존 FAISS DB 초기화 (새로운 PDF 제출 시, 기존 데이터 삭제)
+    # ==================== [추가] 기존 FAISS DB 초기화 ====================
+    # 기존 FAISS DB 초기화 (새로운 파일 제출 시, 기존 데이터 삭제)
     if os.path.exists(db_path):
-        st.warning("기존 FAISS DB가 존재하여, 새로운 PDF로 초기화합니다. 이전 내용은 삭제됩니다.")
+        st.warning("기존 FAISS DB가 존재하여, 새로운 파일로 초기화합니다. 이전 내용은 삭제됩니다.")
         
-        # --- 수정된 부분 ---
         # 1. FAISS 폴더를 삭제
         shutil.rmtree(db_path)
         # 2. 캐시된 FAISS 인스턴스도 함께 삭제
@@ -298,18 +309,23 @@ if submit_button and pdf_file is not None:
         st.session_state.current_question = None
         st.session_state.messages = []
         st.session_state.wrong_answers = []
-    # ------------------
+    # ====================================================================
     
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
-        temp_pdf.write(pdf_file.read())
-        temp_path = temp_pdf.name
-    
-    st.session_state.pdf_path = temp_path
-    st.session_state.pdf_processed = False
+    # 파일 확장자에 따라 적절한 suffix 설정
+    file_extension = os.path.splitext(pdf_file.name)[1].lower()
+    if file_extension not in ['.pdf', '.html']:
+        st.error(f"PDF 또는 HTML 파일만 업로드 가능합니다. 업로드된 파일: {pdf_file.name}")
+    else:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as temp_file:
+            temp_file.write(pdf_file.read())
+            temp_path = temp_file.name
+        
+        st.session_state.pdf_path = temp_path
+        st.session_state.pdf_processed = False
 
-    with st.spinner('PDF를 분석하고 있습니다...'):
-        load_and_embed_pdf(st.session_state.pdf_path)
-        # 벡터 스토어를 다시 로드하여 캐시 업데이트
+        with st.spinner('파일을 분석하고 있습니다...'):
+            load_and_embed_pdf(st.session_state.pdf_path)
+        # [추가] 벡터 스토어를 다시 로드하여 캐시 업데이트
         st.session_state.vector_store = get_vector_store()
         q_data = question_generator()
         st.session_state.current_question = q_data

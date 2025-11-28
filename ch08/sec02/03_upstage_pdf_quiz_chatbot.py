@@ -205,7 +205,7 @@ st.markdown("""
 
 # --- PDF 업로드 및 처리 ---
 pdf_file = st.file_uploader(
-    "Upload a PDF", type=["pdf", "html"], label_visibility="collapsed")
+    "Upload a PDF", type="pdf", label_visibility="collapsed")
 submit_button = st.button("제출", type="primary")
 
 # PDF 제출 버튼 클릭 시 동작
