@@ -1,20 +1,21 @@
 import streamlit as st
-from langchain_core.messages import HumanMessage, AIMessage # * 수정
+from langchain_core.messages import HumanMessage, AIMessage
+from langgraph.checkpoint.memory import InMemorySaver  # * 추가
 
-from langchain.tools import tool # * 추가
-from langchain.agents import create_agent # * 추가
-from datetime import datetime # * 추가
-from zoneinfo import ZoneInfo # * 추가
-from pydantic import BaseModel, Field # * 추가
-import yfinance as yf # * 추가
-from langchain_community.tools import DuckDuckGoSearchResults # * 추가
-from langchain_community.utilities import DuckDuckGoSearchAPIWrapper # * 추가
+from langchain.tools import tool 
+from langchain.agents import create_agent 
+from datetime import datetime 
+from zoneinfo import ZoneInfo 
+from pydantic import BaseModel, Field 
+import yfinance as yf 
+from langchain_community.tools import DuckDuckGoSearchResults 
+from langchain_community.utilities import DuckDuckGoSearchAPIWrapper 
 
 from dotenv import load_dotenv
 load_dotenv()
 
 st.title("🛠️도구 호출 챗봇")
-st.caption("⏰시계 + 📉주가 검색 도구 + 🔍웹 검색 도구 기능 장착!")
+st.caption("⏰시계 + 📉주가 검색 도구 + 🔍웹 검색 도구 + 메모리 기능 장착!")
 
 # * 시계 도구 추가
 @tool # @tool 데코레이터를 사용하여 함수를 도구로 등록
@@ -113,7 +114,11 @@ def create_chain():
     tools = [get_current_time, get_yf_stock_history, get_web_search]
 
     # * 에이전트 생성 및 반환
-    return create_agent(model="google_genai:gemini-2.5-flash", tools=tools)
+    return create_agent(
+        model="google_genai:gemini-2.5-flash", 
+        tools=tools, 
+        checkpointer=InMemorySaver() # * 추가
+    )
 
 print_messages()
 
@@ -127,7 +132,8 @@ if user_input := st.chat_input("시간 또는 주식 등에 대해 물어 보세
 
         # invoke 한번에 출력
         ai_answer = st.session_state["chain"].invoke(
-            {"messages": [{"role": "user", "content": user_input}]}
+            {"messages": [{"role": "user", "content": user_input}]},
+            {"configurable": {"thread_id": "1"}},
         )
         
         # AI 답변 내용 추출 (문자열 또는 리스트 형태 처리)
@@ -148,7 +154,6 @@ if user_input := st.chat_input("시간 또는 주식 등에 대해 물어 보세
 
         add_message("assistant", ai_content)
 
-# * 메모리 기능 없음
 # [질문 예시]
 # 부산은 지금 몇시야?
 # 테슬라(TSLA)는 한달 전에 비해 주가가 올랐나 내렸나?
