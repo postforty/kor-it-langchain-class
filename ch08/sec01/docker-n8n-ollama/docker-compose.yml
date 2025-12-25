@@ -6,7 +6,7 @@ services:
     ports:
       - "5678:5678"
     volumes:
-      - C:/docker_data/n8n_data:/home/node/.n8n
+      - D:/docker_data/n8n_data:/home/node/.n8n
     networks:
       - n8n_ollama_net
 
@@ -21,7 +21,7 @@ services:
     environment:
       - OLLAMA_HOST=0.0.0.0
     volumes:
-      - C:/docker_data/ollama_models:/root/.ollama
+      - D:/docker_data/ollama_models:/root/.ollama
 
 networks:
   n8n_ollama_net:
