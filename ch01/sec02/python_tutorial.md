@@ -373,11 +373,17 @@ asyncio.run(main())
 
 **예제**:
 
+| 선언 방식                      | 필수 여부 | 기본값 | 비고                      |
+| ------------------------------ | --------- | ------ | ------------------------- |
+| field: int = Field(...)        | YES       | 없음   | 반드시 데이터 입력 필요   |
+| field: int = Field(default=10) | NO        | 10     | 입력 없으면 10으로 설정   |
+| field: int \| None = None      | NO        | None   | 입력 없으면 None으로 설정 |
+
 ```python
 from pydantic import BaseModel, Field
 
 class User(BaseModel):
-    name: str = Field(..., description="사용자의 이름")
+    name: str = Field(..., description="사용자의 이름") # ... (Ellipsis)는 이 필드가 필수값임을 의미
     age: int = Field(..., gt=0, description="사용자의 나이 (0보다 커야 함)")
     email: str | None = None # 선택적 필드
 

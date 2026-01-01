@@ -13,8 +13,9 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=gemini_api_key)
 
 # 출처:
-# https://github.com/google-gemini/cookbook
-# quickstarts/Get_started.ipynb
+# 공식 문서: https://github.com/google-gemini/cookbook
+# 경로: quickstarts/Get_started.ipynb
+# 전체 경로: https://github.com/google-gemini/cookbook/blob/main/quickstarts/Get_started.ipynb
 chat = client.chats.create(model="gemini-2.5-flash")
 
 while True:
