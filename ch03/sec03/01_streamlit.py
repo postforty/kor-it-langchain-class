@@ -11,11 +11,15 @@ st.title("나만의 챗봇 만들기")
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
-user_input = st.chat_input("궁금한 내용을 물어보세요!")
+# * 저장된 모든 메시지를 반복하여 화면에 표시
+def print_messages():
+    for role, message in st.session_state["messages"]:
+        with st.chat_message(role):
+            st.write(message)
 
-print(user_input)
+print_messages()
 
-if user_input:
+if user_input := st.chat_input("궁금한 내용을 물어보세요!"):
     #   st.write(f"사용자 입력: {user_input}")
 
     #   아바타 추가

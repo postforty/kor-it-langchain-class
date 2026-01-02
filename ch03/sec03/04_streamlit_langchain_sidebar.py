@@ -2,14 +2,14 @@
 import streamlit as st
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.chat_models import init_chat_model
 from langchain_core.output_parsers import StrOutputParser
 
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
+# gemini_api_key = os.getenv("GEMINI_API_KEY")
 
 st.title("나만의 LangChain 챗봇 만들기")
 
@@ -67,8 +67,10 @@ def create_chain():
             ]
         )
 
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash", google_api_key=gemini_api_key)
+    llm = init_chat_model(
+        "google_genai:gemini-2.5-flash-lite",
+        # google_api_key=gemini_api_key
+    )
 
     output_parsers = StrOutputParser()
 
