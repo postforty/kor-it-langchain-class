@@ -92,6 +92,7 @@
 
 #### Section 04-01
 
+- 에이전트와 도구 이해하기 (Agents & Tools)
 - 단기 메모리를 이용해 체계적으로 세션별 대화 기록 관리하기 (Short Term Memory)
 
 #### Section 04-02
