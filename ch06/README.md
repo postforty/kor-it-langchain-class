@@ -7,6 +7,10 @@ uv add jupyter jupyterlab ipykernel
 # https://python.langchain.com/docs/integrations/providers/google/
 uv add langchain-google-genai
 
+uv add langchain-ollama
+
+uv add langchain
+
 uv add python-dotenv
 
 uv add PyMuPDF pypdf langchain langchain_community
@@ -16,8 +20,6 @@ uv add faiss-cpu
 uv add streamlit
 
 uv add pdfplumber
-
-uv add langchain-ollama
 
 uv add langchain_postgres
 ```

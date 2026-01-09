@@ -65,7 +65,7 @@ docker run --name pgvector-container -e POSTGRES_USER=langchain -e POSTGRES_PASS
 #### ✨ 볼륨을 사용하는 경우
 
 ```bash
-docker run --name pgvector-container -e POSTGRES_USER=langchain -e POSTGRES_PASSWORD=langchain -e POSTGRES_DB=langchain -p 5432:5432 -v C:/docker-postgresql/postgresql_data:/var/lib/postgresql/data -d pgvector/pgvector:pg17-trixie
+docker run --name pgvector-container -e POSTGRES_USER=langchain -e POSTGRES_PASSWORD=langchain -e POSTGRES_DB=langchain -p 5432:5432 -v D:/docker-postgresql/postgresql_data:/var/lib/postgresql/data -d pgvector/pgvector:pg17-trixie
 ```
 
 | 옵션                                                               | 설명                                                                                                                           |
