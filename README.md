@@ -111,10 +111,14 @@
 #### Section 05-01
 
 - 사전 구축된 미들웨어(Built-in Middleware) 이해하기
-- LLM Tool Emulator: 가짜 도구(Mock)를 사용하여 에이전트 프로토타이핑 및 테스트
-- TodoListMiddleware: 복잡한 작업을 체계적으로 관리하는 할 일 목록(Todo List) 생성 및 관리
-- Human-in-the-loop (HITL): 도구 실행 전 사람의 승인을 받는 워크플로우
-- PIIMiddleware: 주민등록번호 등 민감한 개인정보 자동 감지 및 마스킹 처리
+- 가짜 도구(Mock)를 사용하여 에이전트 프로토타이핑 및 테스트 (LLM Tool Emulator)
+- 복잡한 작업을 체계적으로 관리하는 할 일 목록(Todo List) 생성 및 관리 (TodoListMiddleware)
+- 도구 실행 전 사람의 승인을 받는 워크플로우 (Human-in-the-loop)
+- 주민등록번호 등 민감한 개인정보 자동 감지 및 마스킹 처리 (PIIMiddleware)
+
+#### Section 05-02
+
+- 에이전트가 이메일 전송 전 사용자에게 허락 받도록 하기 (HITL)
 
 ---
 
