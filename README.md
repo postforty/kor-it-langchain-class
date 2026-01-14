@@ -24,13 +24,11 @@
 
 1. Do it! LLM을 활용한 AI 에이전트 개발 입문
 2. 러닝 랭체인: 랭체인과 랭그래프로 구현하는 RAG, 에이전트, 인지 아키텍처
-3. 테디노트의 랭체인을 활용한 RAG 비법노트(기본편)
-4. 테디노트의 랭체인을 활용한 RAG 비법노트: 심화편
-5. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
-6. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
-7. Anthropic 프롬프트 엔지니어링: <https://docs.anthropic.com/ko/docs/build-with-claude/prompt-engineering/overview>
-8. 랭체인 허브 프롬프트: <https://smith.langchain.com/hub>
-9. Learn Prompting: <https://learnprompting.org/docs/introduction>
+3. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
+4. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
+5. Anthropic 프롬프트 엔지니어링: <https://docs.anthropic.com/ko/docs/build-with-claude/prompt-engineering/overview>
+6. 랭체인 허브 프롬프트: <https://smith.langchain.com/hub>
+7. Learn Prompting: <https://learnprompting.org/docs/introduction>
 
 ---
 
