@@ -40,6 +40,8 @@ graph LR
     C --> D["벡터 저장소<br>(FAISS, PGVector...)"];
 ```
 
+> https://docs.langchain.com/oss/python/langchain/rag#1-indexing
+
 ### RAG의 이점
 
 RAG는 다음과 같은 이점을 제공한다.
@@ -70,3 +72,4 @@ graph LR
 
     B --> F["답변"];
 ```
+> https://docs.langchain.com/oss/python/langchain/rag#2-retrieval-and-generation
