@@ -126,18 +126,9 @@
 
 - 챗봇이 정보를 찾아보고 답변하는 과정 배우기 (Retrieval Augmented Generation, RAG)
 - 챗봇에게 책 읽히기! (Document Loader)
-
-#### Section 06-02
-
 - 긴 문서를 챗봇이 읽기 좋은 작은 조각으로 나누는 방법 배우기 (Text Splitter)
-
-#### Section 06-03
-
 - 텍스트를 숫자로 변환하여 인공지능이 이해하는 언어로 바꾸는 마법 배우기 (Embedding)
-
-#### Section 06-04
-
-- 챗봇이 정보를 저장하고 빠르게 찾아볼 수 있는 특별한 도서관 만들기 (Vector Store)
+- 챗봇이 정보를 저장하고 빠르게 찾아볼 수 있는 특별한 도서관 만들기 (Faiss Vector Store)
 
 ---
 
