@@ -1,5 +1,7 @@
 ## RAG(Retrieval-Augmented Generation)
 
+> https://docs.langchain.com/oss/python/langchain/retrieval#retrieval-pipeline
+
 **요약**: RAG(Retrieval-Augmented Generation)는 대규모 언어 모델(LLM)의 한계를 보완하여, 외부 지식 기반에서 정보를 검색하고 이를 바탕으로 더욱 정확하고 신뢰성 높은 답변을 생성하는 기술이다. RAG는 LLM의 환각 현상, 최신 정보 및 특정 도메인 지식 부족 문제를 해결하며, 정보 검색 및 생성의 두 단계를 거쳐 작동한다. 문서 로더, 텍스트 분할기, 임베딩 모델, 벡터 저장소가 주요 구성 요소이며, 이를 통해 답변의 정확성 향상, 환각 감소, 투명성 제공, 그리고 유연성이라는 이점을 얻을 수 있다.
 
 ### RAG란 무엇인가?
