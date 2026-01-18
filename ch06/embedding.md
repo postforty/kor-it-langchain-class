@@ -104,20 +104,19 @@ OpenAI의 임베딩 모델은 다양한 도메인에서 검증된 안정적인 �
 
 #### 2. Google Gemini 임베딩 모델
 
-Google의 Gemini 임베딩은 2025년 현재 무료 티어에서 가장 관대한 사용 한도를 제공하며, 중소기업과 개발자들에게 최고의 가치를 제공하고 있다.
+Google의 Gemini 임베딩은 2026년 현재 무료 티어에서 가장 관대한 사용 한도를 제공하며, 중소기업과 개발자들에게 최고의 가치를 제공하고 있다.
 
-**최신 업데이트 (2025년):**
+**최신 업데이트 (2026년):**
 
-- **2025년 3월**: Gemini API에서 실험적 출시되었다
-- **2025년 7월**: 정식 출시(GA)가 완료되었다
-- **신규 모델**: text-embedding-005, text-multilingual-embedding-002가 추가되었다
+- **2025년 7월**: `gemini-embedding-001`이 정식 출시(GA)되었다.
+- **주력 모델**: 현재 `gemini-embedding-001`이 Google AI Studio 및 Vertex AI에서 제공되는 유일한 최신 표준 모델이다. (기존 `text-embedding-004`는 2026년 1월 13일부로 서비스가 종료됨)
 
 **핵심 특징:**
 
 - **다국어 지원**: 100개 이상 언어를 지원한다
 - **긴 컨텍스트**: 최대 2,048 토큰 입력을 지원한다
-- **차원 조정**: MRL 기술로 3,072 → 1,536 / 768차원 조정이 가능하다
-- **MTEB 성능**: Multilingual 리더보드에서 평균 68.32점을 기록했다
+- **차원 조정**: MRL(Matryoshka Representation Learning) 기술을 통해 3,072부터 최소 128차원까지 유연한 조정이 가능하다
+- **MTEB 성능**: Multilingual 리더보드에서 지속적으로 최상위권을 유지하고 있다
 
 **비용 및 라이선스:**
 
@@ -162,17 +161,14 @@ BERT 기반의 검증된 문장 임베딩 모델로, 다양한 크기와 성능�
 
 **라이선스:** Apache License 2.0 또는 MIT 라이선스로 배포되어 상업적 사용이 가능하다
 
-#### 3. E5 (Text Embeddings by Weakly-Supervised Contrastive Pre-training)
+#### 4. NVIDIA & Qwen (최신 고성능 모델)
 
-Microsoft에서 개발한 임베딩 모델로, Weakly-supervised contrastive learning 기반의 혁신적인 접근법을 사용한다.
+2026년 현재 MTEB 리더보드 상위권에는 NVIDIA와 Alibaba의 Qwen 모델이 강력한 성능을 보여주고 있다.
 
-**핵심 특징:**
+- **NV-Embed-v2**: NVIDIA에서 개발한 모델로, 검색(Retrieval) 성능에서 세계 최고 수준을 기록하고 있다.
+- **Qwen3-Embedding**: Alibaba의 최신 모델로, 다국어 지원과 지시(Instruction) 성능이 뛰어나다.
 
-- Zero-shot 및 fine-tuned 환경에서 우수한 성능을 보인다
-- `mE5` 시리즈는 다국어 및 instruction-tuned 버전을 포함한다
-- 최신 연구 결과를 반영한 고성능 모델이다
-
-**라이선스:** Apache License 2.0을 채택하여 상업적 사용이 자유롭다
+**라이선스:** 모델별로 차이가 있으나, 대부분 비상업적 또는 특정 조건 하에 사용 가능하다.
 
 ### 한국어 특화 임베딩 모델
 
@@ -241,7 +237,7 @@ Microsoft에서 개발한 임베딩 모델로, Weakly-supervised contrastive lea
 
 모델 실행에 필요한 메모리 크기를 측정하는 지표이다.
 
-## 2025년 임베딩 모델 선택 가이드
+## 2026년 임베딩 모델 선택 가이드
 
 ### 비용 효율성 기준
 
@@ -251,9 +247,9 @@ Microsoft에서 개발한 임베딩 모델로, Weakly-supervised contrastive lea
 
 ### 성능 기준
 
-1. **최고 성능**: OpenAI text-embedding-3-large
-2. **균형잡힌 성능**: Google Gemini 최신 모델
-3. **특화 성능**: BGE-M3 (다기능), 한국어 특화 모델
+1. **최고 성능**: OpenAI text-embedding-3-large, NV-Embed-v2
+2. **균형잡힌 성능**: Google gemini-embedding-001
+3. **특화 성능**: BGE-M3 (다기능), Qwen3-Embedding (다국어)
 
 ### 기술적 요구사항 기준
 
