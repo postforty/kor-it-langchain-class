@@ -1,24 +1,25 @@
 import streamlit as st
-from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.agents import create_agent
+from langchain.tools import tool
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
 import tempfile
 import os
 import json
 import random
 import re
+import shutil
 from dotenv import load_dotenv
 load_dotenv()
 
 # 세션 상태 초기화
-if "chat_history_for_chain" not in st.session_state:
-    st.session_state.chat_history_for_chain = ChatMessageHistory()
-if "pdf_context" not in st.session_state:
-    st.session_state.pdf_context = ""
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "pdf_context" not in st.session_state:
+    st.session_state.pdf_context = ""
 if "pdf_processed" not in st.session_state:
     st.session_state.pdf_processed = False
 if "current_question" not in st.session_state:
@@ -27,21 +28,83 @@ if "wrong_answers" not in st.session_state:
     st.session_state.wrong_answers = []
 if "is_retest" not in st.session_state:
     st.session_state.is_retest = False
+if "vectorstore" not in st.session_state:
+    st.session_state.vectorstore = None
+if "agent" not in st.session_state:
+    st.session_state.agent = None
 
-chat = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash")
+chat = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/gemini-embedding-001",
+    transport='rest' # Streamlit 환경에서의 호환성 및 안정성을 위해 설정
+)
+db_path = "faiss_index_01"
+
+@st.cache_resource
+def get_vectorstore():
+    """FAISS 인덱스를 로컬에서 로드하거나 None을 반환합니다."""
+    if os.path.exists(db_path):
+        try:
+            return FAISS.load_local(db_path, embeddings, allow_dangerous_deserialization=True)
+        except Exception as e:
+            st.error(f"FAISS DB 로딩 오류: {e}")
+            return None
+    return None
+
+# 전역 세션 상태에 벡터스토어 할당 (캐시 활용)
+st.session_state.vectorstore = get_vectorstore()
+
+# --- 도구(Tool) 정의 ---
+@tool
+def search_pdf_documents(query: str) -> str:
+    """업로드된 PDF 문서 내에서 정보를 검색합니다. 
+    사실 확인이나 전문적인 내용이 필요할 때 사용하세요.
+    """
+    if st.session_state.vectorstore is None:
+        return "검색할 문서가 없습니다."
+    
+    # 유사도 검색을 통해 관련 문서 발췌
+    docs = st.session_state.vectorstore.similarity_search(query, k=3)
+    return "\n\n".join([doc.page_content for doc in docs])
 
 # --- 함수 정의 ---
 def load_and_parse_pdf(pdf_path):
-    """PDF 파일을 로드하고 파싱하여 세션 상태에 저장합니다."""
-
-    loader = UnstructuredFileLoader(pdf_path)
+    """PDF 파일을 로드, 분할하고 FAISS 벡터스토어를 생성 및 저장합니다."""
+    loader = PyMuPDFLoader(pdf_path)
     docs = loader.load()
 
-    pdf_context = ''
-    for doc in docs:
-        pdf_context += doc.page_content
-    st.session_state.pdf_context = pdf_context
+    # 1. 텍스트 분할 (임베딩 쿼터 및 검색 효율을 위해)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    split_docs = text_splitter.split_documents(docs)
+
+    # 2. 벡터스토어 생성 및 저장
+    if st.session_state.vectorstore:
+        st.session_state.vectorstore.add_documents(split_docs)
+    else:
+        st.session_state.vectorstore = FAISS.from_documents(split_docs, embeddings)
+    
+    st.session_state.vectorstore.save_local(db_path)
+    get_vectorstore.clear() # 캐시 갱신을 위해 클리어
+
+    # 3. 전체 문맥 저장 (퀴즈 생성용)
+    st.session_state.pdf_context = "\n".join([doc.page_content for doc in docs])
+
+    # 4. 에이전트 초기화 (RAG 도구 포함)
+    initialize_agent()
+
+def initialize_agent():
+    """에이전트를 생성하고 세션 상태에 저장합니다."""
+    system_prompt = """당신은 업로드된 PDF 문서를 바탕으로 학습을 돕는 교육 전문가입니다.
+    1. 사용자의 질문에 대해 'search_pdf_documents' 도구를 사용하여 정확한 정보를 찾으세요.
+    2. 답변은 반드시 검색된 문서의 내용에만 기반하여 한국어로 작성하세요.
+    3. 문서에 관련 내용이 없다면 억지로 꾸며내지 말고 솔직하게 모른다고 답변하세요.
+    """
+    
+    st.session_state.agent = create_agent(
+        model="google_genai:gemini-2.5-flash",
+        tools=[search_pdf_documents],
+        system_prompt=system_prompt
+    )
 
 
 def question_generator():
@@ -145,35 +208,23 @@ def check_answer_and_proceed(user_message):
 
 
 def general_response_generator(user_message):
-    """일반적인 대화에 대한 응답을 생성합니다."""
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                """
-                사용자가 올바르게 대답했다면, 다음 질문을 해주세요.
-                사용자가 답변하지 않았거나 틀렸을 경우, 제공된 텍스트를 바탕으로 설명해 주시기 바랍니다.
-                한국어로 대답해야 합니다.
-                제공된 텍스트: {context}""",
-            ),
-            ("placeholder", "{chat_history}"),
-            ("human", "{input}"),
-        ]
-    )
-    chain = prompt | chat
+    """에이전트를 사용하여 일반적인 대화에 대한 응답을 생성합니다."""
+    if st.session_state.agent is None:
+        return "에이전트가 초기화되지 않았습니다."
 
-    chain_with_message_history = RunnableWithMessageHistory(
-        chain,
-        lambda session_id: st.session_state.chat_history_for_chain,
-        input_messages_key="input",
-        history_messages_key="chat_history",
-    )
-
-    response = chain_with_message_history.invoke(
-        {"input": user_message, "context": st.session_state.pdf_context},
-        {"configurable": {"session_id": "123"}},
-    )
-    return response.content
+    # 히스토리 구성 (최근 대화 5개 정도 유지)
+    history = []
+    for msg in st.session_state.messages[-10:]:
+        role = "user" if msg["role"] == "user" else "assistant"
+        history.append({"role": role, "content": msg["content"]})
+    
+    # 에이전트 실행
+    result = st.session_state.agent.invoke({
+        "messages": history
+    })
+    
+    # 최신 create_agent는 마지막 AI 메시지를 반환
+    return result["messages"][-1].content
 
 
 # --- Streamlit UI 구성 ---
@@ -209,12 +260,21 @@ pdf_file = st.file_uploader(
 submit_button = st.button("제출", type="primary")
 
 # PDF 제출 버튼 클릭 시 동작
-if submit_button and pdf_file is not None and not st.session_state.pdf_processed:
+if submit_button and pdf_file is not None:
+    # 기존 데이터 초기화 (신규 파일 업로드 시)
+    if os.path.exists(db_path):
+        shutil.rmtree(db_path)
+        get_vectorstore.clear()
+        st.session_state.vectorstore = None
+        st.session_state.messages = []
+        st.session_state.wrong_answers = []
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
         temp_pdf.write(pdf_file.read())
         temp_path = temp_pdf.name
 
     st.session_state.pdf_path = temp_path
+    st.session_state.pdf_processed = False
 
     with st.spinner('PDF를 분석하고 있습니다...'):
         load_and_parse_pdf(st.session_state.pdf_path)
@@ -224,6 +284,10 @@ if submit_button and pdf_file is not None and not st.session_state.pdf_processed
     if q_data:
         display_question(q_data)
         st.session_state.pdf_processed = True
+
+# 기존에 처리된 문서가 있다면 에이전트 복구 (세션 끊김 방지)
+if st.session_state.vectorstore and st.session_state.agent is None:
+    initialize_agent()
 
 # --- 챗봇 인터페이스 ---
 for message in st.session_state.messages:
