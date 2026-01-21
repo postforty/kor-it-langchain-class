@@ -24,7 +24,7 @@ embeddings = GoogleGenerativeAIEmbeddings(
     model="models/gemini-embedding-001",
     transport='rest' # Streamlit 환경에서의 호환성 및 안정성을 위해 설정
 )
-db_path = "faiss_index_scaffold"
+db_path = "faiss_index_pdf_quiz"
 
 # 세션 상태 초기화 (UI 상태 유지용)
 if "messages" not in st.session_state:
