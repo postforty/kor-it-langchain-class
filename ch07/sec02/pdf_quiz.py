@@ -19,8 +19,11 @@ load_dotenv()
 
 # --- [초기 설정] ---
 # 모델 및 임베딩 설정
-chat = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", transport='rest')
+chat = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/gemini-embedding-001",
+    transport='rest' # Streamlit 환경에서의 호환성 및 안정성을 위해 설정
+)
 db_path = "faiss_index_scaffold"
 
 # 세션 상태 초기화 (UI 상태 유지용)
@@ -64,34 +67,69 @@ st.session_state.vectorstore = get_vectorstore()
 # Mission 2: Tool 정의
 @tool
 def search_pdf_documents(query: str) -> str:
-    """PDF 문서 내에서 정보를 검색합니다."""
-    # TODO: st.session_state.vectorstore가 있다면 similarity_search를 수행하고 결과를 반환하세요.
-    if st.session_state.vectorstore:
+    """업로드된 PDF 문서 내에서 정보를 검색합니다. 
+    사실 확인이나 전문적인 내용이 필요할 때 사용하세요.
+    """
+    if st.session_state.vectorstore is not None:
+        # 벡터스토어에서 유사도 검색 수행 (k=3)
         docs = st.session_state.vectorstore.similarity_search(query, k=3)
         return "\n\n".join([doc.page_content for doc in docs])
     return "검색할 문서가 없습니다."
 
 def load_and_parse_pdf(pdf_path):
-    """Mission 1: PDF 로드, 분할, 벡터스토어 생성"""
-    # 1. TODO: PyMuPDFLoader를 사용하여 PDF를 로드하세요.
+    # (주의: embeddings, db_path 등은 scaffold의 전역 변수나 세션 상태를 활용한다고 가정)
+    # 1. PDF 로드 (하나의 객체로 로드됨)
+    loader = PyMuPDFLoader(pdf_path)
+    docs = loader.load()
+
+    # 2. 텍스트 분할 (청크 크기 1000, 겹침 100)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    split_docs = text_splitter.split_documents(docs)
+
+    # 3. 벡터스토어 생성 및 로컬 저장
+    st.session_state.vectorstore = FAISS.from_documents(split_docs, embeddings)
+    st.session_state.vectorstore.save_local(db_path)
     
-    # 2. TODO: RecursiveCharacterTextSplitter로 문서를 분할하세요. (chunk_size=1000)
-    
-    # 3. TODO: FAISS.from_documents를 사용하여 벡터스토어를 생성하고 로컬에 저장하세요.
-    
-    # 4. 전체 텍스트를 하나로 합쳐서 st.session_state.pdf_context에 저장 (퀴즈 생성용)
-    pass
+    # 전체 컨텍스트 저장 (퀴즈 생성용)
+    st.session_state.pdf_context = "\n".join([doc.page_content for doc in docs])
+
 
 def initialize_agent():
-    """Mission 2: 에이전트 초기화"""
-    # TODO: create_agent를 사용하여 에이전트를 생성하고 st.session_state.agent에 저장하세요.
-    pass
+    # (주의: chat, search_pdf_documents 등은 scaffold의 전역 변수 활용 가정)
+    system_prompt = """당신은 업로드된 PDF 문서를 바탕으로 학습을 돕는 교육 전문가입니다.
+    1. 사용자의 질문에 대해 'search_pdf_documents' 도구를 사용하여 정확한 정보를 찾으세요.
+    2. 답변은 반드시 검색된 문서의 내용에만 기반하여 한국어로 작성하세요.
+    3. 문서에 관련 내용이 없다면 억지로 꾸며내지 말고 솔직하게 모른다고 답변하세요.
+    """
+    
+    st.session_state.agent = create_agent(
+        model=chat,
+        tools=[search_pdf_documents],
+        system_prompt=system_prompt
+    )
+
 
 def question_generator():
-    """Mission 3: 프롬프트 템플릿을 이용한 퀴즈 생성"""
-    # TODO: 4지선다 JSON 형식을 요구하는 ChatPromptTemplate을 작성하고 invoke 하세요.
-    # 제공된 parse_ai_json 함수를 사용하여 결과를 반환하세요.
-    return None
+    # (주의: chat, st.session_state.pdf_context 등은 scaffold의 전역/세션 변수 활용 가정)
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """당신은 제공된 텍스트에서 4지선다 객관식 문제를 생성하는 교육용 AI입니다.
+        반드시 다음 JSON 형식으로만 응답하세요:
+        {{
+            "question": "문제 내용",
+            "options": ["1. 보기1", "2. 보기2", "3. 보기3", "4. 보기4"],
+            "answer": "정답 번호 (1~4)",
+            "explanation": "해설"
+        }}
+        
+        텍스트: {context}"""),
+        ("human", "문제를 1개 생성해 주세요.")
+    ])
+    
+    chain = prompt | chat
+    ai_response = chain.invoke({"context": st.session_state.pdf_context})
+    
+    # Scaffold에 제공된 parse_ai_json 함수를 사용하여 JSON 추출 및 결과 반환
+    return parse_ai_json(ai_response.content)
 
 # --- [나머지 UI 및 로직: 스캐폴딩 제공] ---
 

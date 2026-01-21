@@ -7,7 +7,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def load_and_parse_pdf_implement(pdf_path, embeddings, db_path):
+# PyMuPDFLoader, RecursiveCharacterTextSplitter, FAISS를 활용한 인덱싱 과정을 담고 있습니다.
+
+def load_and_parse_pdf(pdf_path):
+    # (주의: embeddings, db_path 등은 scaffold의 전역 변수나 세션 상태를 활용한다고 가정)
     # 1. PDF 로드 (하나의 객체로 로드됨)
     loader = PyMuPDFLoader(pdf_path)
     docs = loader.load()
@@ -17,11 +20,10 @@ def load_and_parse_pdf_implement(pdf_path, embeddings, db_path):
     split_docs = text_splitter.split_documents(docs)
 
     # 3. 벡터스토어 생성 및 로컬 저장
-    vectorstore = FAISS.from_documents(split_docs, embeddings)
-    vectorstore.save_local(db_path)
+    st.session_state.vectorstore = FAISS.from_documents(split_docs, embeddings)
+    st.session_state.vectorstore.save_local(db_path)
     
-    # 전체 컨텍스트 반환 (퀴즈 생성용)
-    full_context = "\n".join([doc.page_content for doc in docs])
-    return vectorstore, full_context
+    # 전체 컨텍스트 저장 (퀴즈 생성용)
+    st.session_state.pdf_context = "\n".join([doc.page_content for doc in docs])
 
 # (테스트 코드 생략)
