@@ -10,7 +10,7 @@
 > 참고: <https://hub.docker.com/r/ollama/ollama>
 
 ```bash
-docker run -d -v C:/docker_data/ollama_models:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+docker run -d -v D:/docker_data/ollama_models:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
 ```
 
 | **명령어/옵션**                                 | **설명**                                                                                    |
