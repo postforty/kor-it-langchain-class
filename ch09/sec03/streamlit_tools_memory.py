@@ -15,10 +15,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 st.title("🛠️도구 호출 챗봇")
-st.caption("⏰시계 + 📉주가 검색 도구 + 🔍웹 검색 도구 + 메모리 기능 장착!")
+st.caption("⏰시계 + 📉주가 검색 + 🔍웹 검색 + 🧠메모리 + ⚡개선된 UX!")
+
+# * 세션 상태 초기화 (thread_id 추가)
+if "thread_id" not in st.session_state:
+    st.session_state["thread_id"] = str(datetime.now().timestamp())
 
 # * 시계 도구 추가
-@tool # @tool 데코레이터를 사용하여 함수를 도구로 등록
+@tool
 def get_current_time(timezone: str, location: str) -> str:
     """ 현재 시각을 반환하는 함수
 
@@ -48,37 +52,36 @@ def get_yf_stock_history(stock_history_input: StockHistoryInput) -> str:
     return history_md
 
 @tool
-def get_web_search(query: str, search_period: str='w') -> str:
+def get_web_search(query: str, search_period: str='w', region: str='kr-kr') -> str:
     """
-    웹 검색을 수행하는 함수.
+    특정 지역과 기간을 설정하여 웹 검색(뉴스)을 수행합니다.
 
     Args:
         query (str): 검색어
-        search_period (str): 검색 기간 (e.g., "w" for past week (default), "m" for past month, "y" for past year, "d" for past day)
-
+        search_period (str): 검색 기간. 'd'(일간), 'w'(주간), 'm'(월간), 'y'(연간) 중 선택
+        region (str): 검색 지역 코드. 한국('kr-kr'), 미국('us-en'), 일본('jp-jp'), 영국('uk-en') 등
+    
     Returns:
-        str: 검색 결과
+        str: 검색된 뉴스 결과 리스트
     """
+    # 1. 전달받은 region과 search_period로 API 설정
     wrapper = DuckDuckGoSearchAPIWrapper(
-        region="kr-kr",
+        region=region,
         time=search_period
     )
 
-    print('\n----- WEB SEARCH -----')
-    print(query)
-    print(search_period)
+    print('\n----- WEB SEARCH (News) -----')
+    print(f"QUERY  : {query}")
+    print(f"REGION : {region}")
+    print(f"PERIOD : {search_period}")
 
     search = DuckDuckGoSearchResults(
         api_wrapper=wrapper,
-        source="news",
+        backend="news",
         results_separator=';\n'
     )
 
     searched = search.invoke(query)
-    
-    for i, result in enumerate(searched.split(';\n')):
-        print(f'{i+1}. {result}')
-    
     return searched
 
 if "messages" not in st.session_state:
@@ -90,6 +93,8 @@ if "chain" not in st.session_state:
 def clear_task():
     st.session_state["messages"] = []
     st.session_state["chain"] = None
+    # 새로운 대화 세션을 위해 thread_id 초기화
+    st.session_state["thread_id"] = str(datetime.now().timestamp())
     
 with st.sidebar:  
     clear_btn = st.button("대화 초기화", on_click=clear_task)
@@ -128,31 +133,46 @@ if st.session_state["chain"] is None:
 if user_input := st.chat_input("시간 또는 주식 등에 대해 물어 보세요!"):
     if st.session_state["chain"] is not None:
         st.chat_message("user").write(user_input)
-        add_message("user", user_input)  # st.session_state.messages에 사용자 입력값 추가
+        add_message("user", user_input)
 
-        # invoke 한번에 출력
-        ai_answer = st.session_state["chain"].invoke(
-            {"messages": [{"role": "user", "content": user_input}]},
-            {"configurable": {"thread_id": "1"}},
-        )
-        
-        # AI 답변 내용 추출 (문자열 또는 리스트 형태 처리)
-        last_message = ai_answer["messages"][-1]
-        ai_content = ""
-        
-        if isinstance(last_message.content, str):
-            ai_content = last_message.content
-        elif isinstance(last_message.content, list):
-            for content_part in last_message.content:
-                if isinstance(content_part, dict) and content_part.get("type") == "text":
-                    ai_content += content_part.get("text", "")
-                elif isinstance(content_part, str):
-                    ai_content += content_part
+        with st.chat_message("assistant"):
+            # 1. 답변을 출력할 컨테이너를 status 외부(상단)에 생성
+            ai_container = st.empty()
+            
+            # 2. 도구 호출 및 처리 과정을 보여주는 status box
+            with st.status("답변을 생성하고 있습니다...", expanded=True) as status:
+                # stream을 통해 중간 과정 및 최종 결과 수집
+                final_state = None
+                for state in st.session_state["chain"].stream(
+                    {"messages": [{"role": "user", "content": user_input}]},
+                    {"configurable": {"thread_id": st.session_state["thread_id"]}},
+                    stream_mode="values"
+                ):
+                    final_state = state
+                    # 중간 과정에서 도구 호출 등의 메시지가 추가될 때마다 status 업데이트
+                    last_msg = state["messages"][-1]
+                    if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
+                        for tool_call in last_msg.tool_calls:
+                            status.write(f"🛠️ `{tool_call['name']}` 도구를 실행 중입니다...")
+                
+                status.update(label="답변 완료!", state="complete", expanded=False)
 
-        print("ai_answer:", ai_answer["messages"])
-        st.chat_message("assistant").write(ai_content) 
-
-        add_message("assistant", ai_content)
+            # 3. 최종 답변 추출 및 컨테이너에 출력
+            if final_state:
+                last_message = final_state["messages"][-1]
+                ai_content = ""
+                
+                if isinstance(last_message.content, str):
+                    ai_content = last_message.content
+                elif isinstance(last_message.content, list):
+                    for content_part in last_message.content:
+                        if isinstance(content_part, dict) and content_part.get("type") == "text":
+                            ai_content += content_part.get("text", "")
+                        elif isinstance(content_part, str):
+                            ai_content += content_part
+                
+                ai_container.write(ai_content)
+                add_message("assistant", ai_content)
 
 # [질문 예시]
 # 부산은 지금 몇시야?

@@ -1,9 +1,9 @@
 # FastMCP 설치: https://github.com/jlowin/fastmcp?tab=readme-ov-file#installation
 # MCP Inspector: https://modelcontextprotocol.io/docs/tools/inspector
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP # uv add fastmcp
 from datetime import datetime
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo # uv add tzdata
 from pydantic import BaseModel, Field
 import yfinance as yf
 
@@ -62,4 +62,4 @@ def get_server_info() -> str:
 
 if __name__ == "__main__":
     """서버를 실행합니다."""
-    mcp.run(transport="streamable-http") # uv run mcp_server.py 실행
+    mcp.run(transport="streamable-http") # uv run mcp_server.py
