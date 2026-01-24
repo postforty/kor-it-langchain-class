@@ -3,7 +3,7 @@ name = "ch09"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "beautifulsoup4>=4.13.5",
     "ddgs>=9.5.2",
@@ -13,6 +13,7 @@ dependencies = [
     "jupyter>=1.1.1",
     "jupyterlab>=4.4.7",
     "langchain>=1.1.0",
+    "langchain-community>=0.4.1",
     "langchain-google-genai>=3.2.0",
     "langgraph>=1.0.4",
     "markdown>=3.9",
@@ -22,5 +23,6 @@ dependencies = [
     "pypdf>=5.9.0",
     "pyppeteer>=2.0.0",
     "python-dotenv>=1.1.1",
+    "tzdata>=2025.3",
     "unstructured>=0.18.14",
 ]
