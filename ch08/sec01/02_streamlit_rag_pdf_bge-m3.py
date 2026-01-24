@@ -18,8 +18,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-
 st.title("PDF 기반 QA봇")
 st.caption("Ollama BGE-M3 + Gemini-2.5-FLASH")
 
@@ -106,7 +104,7 @@ def create_chain(retriever, prompt_filepath):
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
         temperature=0,
-        google_api_key=gemini_api_key)
+    )
 
     output_parsers = StrOutputParser()
 
