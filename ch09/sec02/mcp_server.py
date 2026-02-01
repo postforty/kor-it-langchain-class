@@ -6,6 +6,8 @@ from datetime import datetime
 from zoneinfo import ZoneInfo # uv add tzdata
 from pydantic import BaseModel, Field
 import yfinance as yf
+from langchain_community.tools import DuckDuckGoSearchResults 
+from langchain_community.utilities import DuckDuckGoSearchAPIWrapper 
 
 # FastMCP 인스턴스 생성
 mcp = FastMCP("Simple MCP Server")
@@ -41,6 +43,33 @@ def get_yf_stock_history(stock_history_input: StockHistoryInput) -> str:
     history_md = history.to_markdown() 
 
     return history_md
+
+@mcp.tool()
+def get_web_search(query: str, search_period: str='w', region: str='kr-kr') -> str:
+    """
+    특정 지역과 기간을 설정하여 웹 검색(뉴스)을 수행합니다.
+
+    Args:
+        query (str): 검색어
+        search_period (str): 검색 기간. 'd'(일간), 'w'(주간), 'm'(월간), 'y'(연간) 중 선택
+        region (str): 검색 지역 코드. 한국('kr-kr'), 미국('us-en'), 일본('jp-jp'), 영국('uk-en') 등
+    
+    Returns:
+        str: 검색된 뉴스 결과 리스트
+    """
+    wrapper = DuckDuckGoSearchAPIWrapper(
+        region=region,
+        time=search_period
+    )
+    
+    search = DuckDuckGoSearchResults(
+        api_wrapper=wrapper,
+        backend="news",
+        results_separator=';\n'
+    )
+
+    searched = search.invoke(query)
+    return searched
 
 @mcp.resource("simple://info")  # 리소스 정의(필수 아님)
 def get_server_info() -> str:
