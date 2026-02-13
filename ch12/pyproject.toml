@@ -3,17 +3,11 @@ name = "ch12"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "ipykernel>=6.30.1",
     "jupyter>=1.1.1",
     "jupyterlab>=4.4.5",
-    "langchain>=0.3.27",
-    "langchain-community>=0.3.27",
-    "langchain-google-genai>=2.1.10",
-    "langgraph[draw]>=0.6.7",
-    "pymupdf>=1.26.4",
+    "langgraph>=1.0.8",
     "python-dotenv>=1.1.1",
-    "faiss-cpu>=1.11.0.post1",
-    "ddgs>=9.6.0",
 ]
