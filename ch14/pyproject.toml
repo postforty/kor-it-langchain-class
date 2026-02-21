@@ -16,4 +16,9 @@ dependencies = [
     "langchain-core>=1.2.13",
     "langchain-google-genai>=4.2.0",
     "langgraph-checkpoint-sqlite>=3.0.3",
+    "langchain-community>=0.4.1",
+    "pymupdf>=1.27.1",
+    "pypdf>=6.7.1",
+    "langchain-ollama>=1.0.1",
+    "langchain-classic>=1.0.1",
 ]
