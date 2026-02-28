@@ -3,7 +3,7 @@ name = "ch02"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "google-genai>=1.27.0",
     "ipykernel>=6.30.1",

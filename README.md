@@ -22,8 +22,8 @@
 
 ### 참고
 
-1. Do it! LLM을 활용한 AI 에이전트 개발 입문
-2. 러닝 랭체인: 랭체인과 랭그래프로 구현하는 RAG, 에이전트, 인지 아키텍처
+1. 메이오 오신, 누노 캄포스, *러닝 랭체인: 랭체인과 랭그래프로 구현하는 RAG, 에이전트, 인지 아키텍처*, 강민혁 역. 한빛미디어, 2025.
+2. 수하스 파이, *실무로 통하는 LLM 애플리케이션 설계*, 박조은 역. 한빛미디어, 2025.
 3. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
 4. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
 5. Anthropic 프롬프트 엔지니어링: <https://docs.anthropic.com/ko/docs/build-with-claude/prompt-engineering/overview>
