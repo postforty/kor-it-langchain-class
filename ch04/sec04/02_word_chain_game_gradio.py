@@ -22,7 +22,6 @@ user가 승리한 경우에는 "YOU WIN!", user가 패배한 경우에는 "YOU L
 
 agent = create_agent(
     model="google_genai:gemini-2.5-flash", 
-    tools=[],
     checkpointer=InMemorySaver(),
     system_prompt=system_prompt,
 )
