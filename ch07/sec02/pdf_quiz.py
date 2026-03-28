@@ -70,9 +70,15 @@ def search_pdf_documents(query: str) -> str:
     """업로드된 PDF 문서 내에서 정보를 검색합니다. 
     사실 확인이나 전문적인 내용이 필요할 때 사용하세요.
     """
-    if st.session_state.vectorstore is not None:
+    # st.session_state에서 안전하게 vectorstore를 가져옵니다.
+    # 에이전트 실행 시 스레드 분리 등으로 인해 session_state 접근이 불안정한 경우를 대비해 get_vectorstore()를 활용합니다.
+    vectorstore = st.session_state.get("vectorstore")
+    if vectorstore is None:
+        vectorstore = get_vectorstore()
+        
+    if vectorstore is not None:
         # 벡터스토어에서 유사도 검색 수행 (k=3)
-        docs = st.session_state.vectorstore.similarity_search(query, k=3)
+        docs = vectorstore.similarity_search(query, k=3)
         return "\n\n".join([doc.page_content for doc in docs])
     return "검색할 문서가 없습니다."
 
@@ -89,6 +95,9 @@ def load_and_parse_pdf(pdf_path):
     # 3. 벡터스토어 생성 및 로컬 저장
     st.session_state.vectorstore = FAISS.from_documents(split_docs, embeddings)
     st.session_state.vectorstore.save_local(db_path)
+    
+    # 캐시 초기화 (새로운 PDF가 로드되면 캐시된 벡터스토어를 지워야 함)
+    get_vectorstore.clear()
     
     # 전체 컨텍스트 저장 (퀴즈 생성용)
     st.session_state.pdf_context = "\n".join([doc.page_content for doc in docs])
@@ -127,9 +136,14 @@ def question_generator():
     
     chain = prompt | chat
     ai_response = chain.invoke({"context": st.session_state.pdf_context})
+    content = ai_response.content
+    
+    # 리스트 형태(구조화된 데이터)일 경우 텍스트 부분만 합치기
+    if isinstance(content, list):
+        content = "".join([part.get("text", "") for part in content if isinstance(part, dict) and part.get("type") == "text"])
     
     # Scaffold에 제공된 parse_ai_json 함수를 사용하여 JSON 추출 및 결과 반환
-    return parse_ai_json(ai_response.content)
+    return parse_ai_json(content)
 
 # --- [나머지 UI 및 로직: 스캐폴딩 제공] ---
 
@@ -153,8 +167,19 @@ def general_response(user_message):
     """에이전트를 통한 일반 대화"""
     if st.session_state.agent:
         history = [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages[-5:]]
+        # 에이전트 실행
         result = st.session_state.agent.invoke({"messages": history + [{"role": "user", "content": user_message}]})
-        return result["messages"][-1].content
+        
+        # 마지막 AI 메시지 추출
+        ai_msg = result["messages"][-1]
+        content = ai_msg.content
+        
+        # 응답이 리스트 형태(구조화된 데이터)인 경우 텍스트 블록만 추출
+        if isinstance(content, list):
+            text_parts = [part.get("text", "") for part in content if isinstance(part, dict) and part.get("type") == "text"]
+            return "".join(text_parts)
+        
+        return content
     return "에이전트가 설정되지 않았습니다."
 
 # --- Streamlit UI 시작 ---
