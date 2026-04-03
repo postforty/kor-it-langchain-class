@@ -91,4 +91,4 @@ def get_server_info() -> str:
 
 if __name__ == "__main__":
     """서버를 실행합니다."""
-    mcp.run(transport="streamable-http") # uv run mcp_server.py
+    mcp.run() # uv run mcp_server.py (stdio 방식)
