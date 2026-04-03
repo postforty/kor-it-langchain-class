@@ -10,17 +10,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-
-
 class PetBot:
     def __init__(self, connection_str):
         self.embedding_model = GoogleGenerativeAIEmbeddings(
             model="gemini-embedding-001",
-            google_api_key=gemini_api_key,
         )
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash", temperature=0.7, google_api_key=gemini_api_key)
+            model="gemini-2.5-flash", temperature=0.7)
 
         # PGVector 객체 초기화 (기존 컬렉션을 사용)
         self.vector_store = PGVector(
