@@ -41,8 +41,6 @@ if "vectorstore" not in st.session_state:
     st.session_state.vectorstore = None
 if "agent" not in st.session_state:
     st.session_state.agent = None
-if "mode" not in st.session_state:
-    st.session_state.mode = "퀴즈 풀기"
 
 # --- [유틸리티 함수: 스캐폴딩 제공] ---
 def parse_ai_json(ai_response):
@@ -185,23 +183,7 @@ def general_response(user_message):
     return "에이전트가 설정되지 않았습니다."
 
 # --- Streamlit UI 시작 ---
-st.title("📖 PDF AI 퀴즈 챗봇")
-
-# 사이드바 설정 영역
-with st.sidebar:
-    st.header("⚙️ 설정")
-    st.session_state.mode = st.radio(
-        "학습 모드 선택",
-        ["퀴즈 풀기", "질문하기"],
-        help="퀴즈를 풀며 학습하거나, 문서에 대해 자유롭게 질문하세요."
-    )
-    
-    if st.session_state.wrong_answers:
-        st.write("---")
-        st.write(f"❌ 틀린 문제: {len(st.session_state.wrong_answers)}개")
-        if st.button("오답 노트 초기화"):
-            st.session_state.wrong_answers = []
-            st.rerun()
+st.title("📖 PDF AI 퀴즈 챗봇 (Scaffold)")
 
 uploaded_file = st.file_uploader("PDF 파일을 업로드하세요", type="pdf")
 if st.button("학습 시작") and uploaded_file:
@@ -212,16 +194,11 @@ if st.button("학습 시작") and uploaded_file:
     with st.spinner("문서를 분석 중..."):
         load_and_parse_pdf(tmp_path)
         initialize_agent()
-        st.session_state.pdf_processed = True
-        
-        if st.session_state.mode == "퀴즈 풀기":
-            q = question_generator()
-            st.session_state.current_question = q
-            if q:
-                msg = q['question'] + "\n\n" + "\n".join(q['options'])
-                st.session_state.messages.append({"role": "assistant", "content": msg})
-        else:
-            st.session_state.messages.append({"role": "assistant", "content": "문서 분석이 완료되었습니다! 분석된 내용에 대해 무엇이든 물어보세요."})
+        q = question_generator()
+        st.session_state.current_question = q
+        if q:
+            st.session_state.messages.append({"role": "assistant", "content": q['question'] + "\n\n" + "\n".join(q['options'])})
+            st.session_state.pdf_processed = True
     os.unlink(tmp_path)
 
 # 대화 창 출력
@@ -231,38 +208,23 @@ for msg in st.session_state.messages:
 
 # 메시지 입력 및 답변 처리
 if prompt := st.chat_input("메시지를 입력하세요"):
-    # PDF가 아직 처리되지 않은 경우 입력 차단
-    if not st.session_state.pdf_processed:
-        st.warning("먼저 PDF 파일을 업로드하고 '학습 시작'을 눌러주세요.")
-        st.stop()
-
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"): st.write(prompt)
 
     with st.chat_message("assistant"):
-        if st.session_state.mode == "퀴즈 풀기":
-            # 퀴즈 모드: 사용자 정답 체크
-            ans_check = check_answer(prompt)
-            if ans_check:
-                st.write(ans_check)
-                st.session_state.messages.append({"role": "assistant", "content": ans_check})
-                # 다음 문제 출제
-                with st.spinner("다음 문제를 생성 중..."):
-                    new_q = question_generator()
-                    st.session_state.current_question = new_q
-                    if new_q:
-                        msg = new_q['question'] + "\n\n" + "\n".join(new_q['options'])
-                        st.write("---")
-                        st.write(msg)
-                        st.session_state.messages.append({"role": "assistant", "content": msg})
-            else:
-                # 입력이 번호가 아닌 경우 가이드 출력
-                guide = "퀴즈 풀기 모드입니다. 정답 번호(1~4)를 입력해 주세요. 문질문에 답변을 듣고 싶다면 사이드바에서 '질문하기' 모드로 변경해 주세요."
-                st.info(guide)
-                st.session_state.messages.append({"role": "assistant", "content": guide})
+        ans_check = check_answer(prompt)
+        if ans_check:
+            st.write(ans_check)
+            st.session_state.messages.append({"role": "assistant", "content": ans_check})
+            # 다음 문제 출제
+            new_q = question_generator()
+            st.session_state.current_question = new_q
+            if new_q:
+                msg = new_q['question'] + "\n\n" + "\n".join(new_q['options'])
+                st.write("---")
+                st.write(msg)
+                st.session_state.messages.append({"role": "assistant", "content": msg})
         else:
-            # 질문하기 모드: 에이전트를 통한 일반 답변 생성
-            with st.spinner("답변을 찾는 중..."):
-                resp = general_response(prompt)
-                st.write(resp)
-                st.session_state.messages.append({"role": "assistant", "content": resp})
+            resp = general_response(prompt)
+            st.write(resp)
+            st.session_state.messages.append({"role": "assistant", "content": resp})
