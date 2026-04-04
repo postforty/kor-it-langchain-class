@@ -26,6 +26,7 @@ dependencies = [
     "pyppeteer>=2.0.0",
     "python-dotenv>=1.1.1",
     "streamlit>=1.53.1",
+    "tabulate>=0.10.0",
     "tzdata>=2025.3",
     "unstructured>=0.18.14",
     "yfinance>=0.2.58",
