@@ -77,12 +77,15 @@ def get_web_search(query: str, search_period: str='w', region: str='kr-kr') -> s
 
     search = DuckDuckGoSearchResults(
         api_wrapper=wrapper,
-        backend="news",
+        # backend="news",
         results_separator=';\n'
     )
 
-    searched = search.invoke(query)
-    return searched
+    try:
+        searched = search.invoke(query)
+        return searched
+    except Exception as e:
+        return f"검색 결과가 없거나 오류가 발생했습니다: {e}"
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
