@@ -11,4 +11,8 @@ dependencies = [
     "langchain>=1.2.7",
     "langchain-google-genai>=4.2.0",
     "python-dotenv>=1.2.1",
+    "faiss-cpu>=1.12.0",
+    "streamlit>=1.48.0",
+    "pymupdf>=1.26.3",
+    "langchain-community>=0.4.1",
 ]
