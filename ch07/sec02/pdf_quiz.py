@@ -16,7 +16,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- [초기 설정] ---
-chat = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+# 모델 초기화 (누락된 chat 객체 추가)
+chat = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
+
 embeddings = GoogleGenerativeAIEmbeddings(
     model="models/gemini-embedding-001",
     transport='rest' # Streamlit 환경에서의 호환성 및 안정성을 위해 설정
@@ -99,7 +101,7 @@ def search_pdf_documents(query: str) -> str:
     return "검색할 문서가 없습니다."
 
 def initialize_agent():
-    # (주의: chat, search_pdf_documents 등은 scaffold의 전역 변수 활용 가정)
+    # (주의: search_pdf_documents 등은 scaffold의 전역 변수 활용 가정)
     system_prompt = """당신은 업로드된 PDF 문서를 바탕으로 학습을 돕는 교육 전문가입니다.
     1. 사용자의 질문에 대해 'search_pdf_documents' 도구를 사용하여 정확한 정보를 찾으세요.
     2. 답변은 반드시 검색된 문서의 내용에만 기반하여 한국어로 작성하세요.
@@ -107,7 +109,7 @@ def initialize_agent():
     """
     
     st.session_state.agent = create_agent(
-        model=chat,
+        model="google_genai:gemini-2.5-flash",
         tools=[search_pdf_documents],
         system_prompt=system_prompt
     )
