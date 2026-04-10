@@ -9,16 +9,13 @@ from langchain_core.prompts import ChatPromptTemplate
 import tempfile
 import os
 import json
-import random
 import re
-import shutil
 from dotenv import load_dotenv
 
 # .env 파일 로드
 load_dotenv()
 
 # --- [초기 설정] ---
-# 모델 및 임베딩 설정
 chat = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 embeddings = GoogleGenerativeAIEmbeddings(
     model="models/gemini-embedding-001",
@@ -64,26 +61,6 @@ def get_vectorstore():
 
 st.session_state.vectorstore = get_vectorstore()
 
-# --- [미션 영역: 수강생이 작성할 부분] ---
-
-# Mission 2: Tool 정의
-@tool
-def search_pdf_documents(query: str) -> str:
-    """업로드된 PDF 문서 내에서 정보를 검색합니다. 
-    사실 확인이나 전문적인 내용이 필요할 때 사용하세요.
-    """
-    # st.session_state에서 안전하게 vectorstore를 가져옵니다.
-    # 에이전트 실행 시 스레드 분리 등으로 인해 session_state 접근이 불안정한 경우를 대비해 get_vectorstore()를 활용합니다.
-    vectorstore = st.session_state.get("vectorstore")
-    if vectorstore is None:
-        vectorstore = get_vectorstore()
-        
-    if vectorstore is not None:
-        # 벡터스토어에서 유사도 검색 수행 (k=3)
-        docs = vectorstore.similarity_search(query, k=3)
-        return "\n\n".join([doc.page_content for doc in docs])
-    return "검색할 문서가 없습니다."
-
 def load_and_parse_pdf(pdf_path):
     # (주의: embeddings, db_path 등은 scaffold의 전역 변수나 세션 상태를 활용한다고 가정)
     # 1. PDF 로드 (하나의 객체로 로드됨)
@@ -104,6 +81,22 @@ def load_and_parse_pdf(pdf_path):
     # 전체 컨텍스트 저장 (퀴즈 생성용)
     st.session_state.pdf_context = "\n".join([doc.page_content for doc in docs])
 
+@tool
+def search_pdf_documents(query: str) -> str:
+    """업로드된 PDF 문서 내에서 정보를 검색합니다. 
+    사실 확인이나 전문적인 내용이 필요할 때 사용하세요.
+    """
+    # st.session_state에서 안전하게 vectorstore를 가져옵니다.
+    # 에이전트 실행 시 스레드 분리 등으로 인해 session_state 접근이 불안정한 경우를 대비해 get_vectorstore()를 활용합니다.
+    vectorstore = st.session_state.get("vectorstore")
+    if vectorstore is None:
+        vectorstore = get_vectorstore()
+        
+    if vectorstore is not None:
+        # 벡터스토어에서 유사도 검색 수행 (k=3)
+        docs = vectorstore.similarity_search(query, k=3)
+        return "\n\n".join([doc.page_content for doc in docs])
+    return "검색할 문서가 없습니다."
 
 def initialize_agent():
     # (주의: chat, search_pdf_documents 등은 scaffold의 전역 변수 활용 가정)
@@ -119,6 +112,24 @@ def initialize_agent():
         system_prompt=system_prompt
     )
 
+def general_response(user_message):
+    """에이전트를 통한 일반 대화"""
+    if st.session_state.agent:
+        history = [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages[-5:]]
+        # 에이전트 실행
+        result = st.session_state.agent.invoke({"messages": history + [{"role": "user", "content": user_message}]})
+        
+        # 마지막 AI 메시지 추출
+        ai_msg = result["messages"][-1]
+        content = ai_msg.content
+        
+        # 응답이 리스트 형태(구조화된 데이터)인 경우 텍스트 블록만 추출
+        if isinstance(content, list):
+            text_parts = [part.get("text", "") for part in content if isinstance(part, dict) and part.get("type") == "text"]
+            return "".join(text_parts)
+        
+        return content
+    return "에이전트가 설정되지 않았습니다."
 
 def question_generator():
     # (주의: chat, st.session_state.pdf_context 등은 scaffold의 전역/세션 변수 활용 가정)
@@ -147,8 +158,6 @@ def question_generator():
     # Scaffold에 제공된 parse_ai_json 함수를 사용하여 JSON 추출 및 결과 반환
     return parse_ai_json(content)
 
-# --- [나머지 UI 및 로직: 스캐폴딩 제공] ---
-
 def check_answer(user_message):
     """사용자가 입력한 숫자가 정답인지 확인"""
     q_data = st.session_state.current_question
@@ -164,25 +173,6 @@ def check_answer(user_message):
             return f"오답입니다. 정답은 {correct_ans}번입니다.\n\n해설: {q_data['explanation']}"
     except ValueError:
         return None
-
-def general_response(user_message):
-    """에이전트를 통한 일반 대화"""
-    if st.session_state.agent:
-        history = [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages[-5:]]
-        # 에이전트 실행
-        result = st.session_state.agent.invoke({"messages": history + [{"role": "user", "content": user_message}]})
-        
-        # 마지막 AI 메시지 추출
-        ai_msg = result["messages"][-1]
-        content = ai_msg.content
-        
-        # 응답이 리스트 형태(구조화된 데이터)인 경우 텍스트 블록만 추출
-        if isinstance(content, list):
-            text_parts = [part.get("text", "") for part in content if isinstance(part, dict) and part.get("type") == "text"]
-            return "".join(text_parts)
-        
-        return content
-    return "에이전트가 설정되지 않았습니다."
 
 # --- Streamlit UI 시작 ---
 st.title("📖 PDF AI 퀴즈 챗봇")
