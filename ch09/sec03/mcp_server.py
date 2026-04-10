@@ -1,4 +1,5 @@
 # FastMCP 설치: https://github.com/jlowin/fastmcp?tab=readme-ov-file#installation
+# 빠른 시작: https://gofastmcp.com/getting-started/quickstart
 # MCP Inspector: https://modelcontextprotocol.io/docs/tools/inspector
 
 from mcp.server.fastmcp import FastMCP # uv add fastmcp
@@ -10,7 +11,7 @@ from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper 
 
 # FastMCP 인스턴스 생성
-mcp = FastMCP("Simple MCP Server")
+mcp = FastMCP("My MCP Server")
 
 @mcp.tool()  # 도구 정의
 def hello(name: str = "아무개") -> str:
@@ -91,4 +92,25 @@ def get_server_info() -> str:
 
 if __name__ == "__main__":
     """서버를 실행합니다."""
-    mcp.run() # uv run mcp_server.py (stdio 방식)
+    mcp.run()
+
+# 발생했던 오류 및 해결 방법:
+# 1. ERROR Failed to run: Already running asyncio in this thread (cli.py:533)
+#    - 발생: uv run fastmcp run mcp_server.py:mcp 실행 시
+#    - 원인: Windows 환경에서 FastMCP 2.x 버전의 비동기 이벤트 루프 충돌 문제
+#    - 해결: uv add fastmcp --upgrade 명령을 통해 FastMCP 3.2.3 이상으로 업데이트하여 해결
+#
+# 2. [WinError 10048] 각 소켓 주소(프로토콜/네트워크 주소/포트)는 하나만 사용할 수 있습니다
+#    - 발생: --port 8000 등으로 실행 시
+#    - 원인: 지정한 포트가 이미 다른 프로세스(이전 서버 등)에 의해 사용 중임
+#    - 해결: 해당 포트를 사용하는 프로세스를 종료하거나, 다른 포트를 지정하여 실행
+
+# 구동 방법:
+# 1. 기본 실행 (stdio 방식 - Claude Desktop 등 연동 시)
+#    uv run fastmcp run mcp_server.py:mcp
+#
+# 2. HTTP 방식 실행 (SSE - 외부 클라이언트 접속 시)
+#    uv run fastmcp run mcp_server.py:mcp --transport http --port 8000
+#
+# 3. 개발 및 테스트 (Inspector UI 실행)
+#    uv run fastmcp dev inspector mcp_server.py:mcp

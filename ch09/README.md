@@ -13,21 +13,6 @@ uv add pypdf langchain langchain_community
 
 uv add langgraph
 
-uv add langchain-ollama
-
-uv add py-zerox
-
-uv add nest_asyncio
-
-uv add "unstructured[md]" nltk
-
-uv add langchain-text-splitters
-
-uv add markdown html2text beautifulsoup4
-
-uv add langchain_postgres
-
-uv add pyppeteer
 ```
 
 ### 랭체인 구글 제미나이 임베딩

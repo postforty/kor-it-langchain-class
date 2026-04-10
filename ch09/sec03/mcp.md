@@ -30,6 +30,21 @@ MCP의 작동 방식은 **호스트-클라이언트-서버** 모델을 따른다
 2.  **클라이언트**는 서버와 통신하며 데이터를 주고받는다.
 3.  **서버**는 요청에 따라 도구를 실행하거나 리소스를 조회한 뒤, 그 결과를 클라이언트를 통해 다시 호스트에 전달한다.
 
+```mermaid
+sequenceDiagram
+    box 호스트 시스템 (Host Application)
+        participant Host as 호스트
+        participant Client as 클라이언트
+    end
+    participant Server as 서버
+
+    Host->>Client: 1. 작업 요청
+    Client->>Server: 2. 통신 및 데이터 전송
+    Note over Server: 3. 도구 실행 또는<br/>리소스 조회
+    Server-->>Client: 4. 결과 반환
+    Client-->>Host: 5. 결과 전달
+```
+
 ---
 
 ## **MCP 서버**
