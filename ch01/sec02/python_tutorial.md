@@ -283,6 +283,19 @@ print(f"16의 제곱근: {sqrt(16)}")
 **예제**:
 
 ```python
+# 클로저
+def calc_add():
+    result = 0
+
+    def inner_func(num):
+        nonlocal result
+        result += num
+        return result
+    
+    return inner_func
+```
+
+```python
 def my_decorator(func):
     def wrapper():
         print("함수 실행 전!")
