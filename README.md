@@ -28,7 +28,8 @@
 4. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
 5. Anthropic 프롬프트 엔지니어링: <https://docs.anthropic.com/ko/docs/build-with-claude/prompt-engineering/overview>
 6. 랭체인 허브 프롬프트: <https://smith.langchain.com/hub>
-7. Learn Prompting: <https://learnprompting.org/docs/introduction>
+7. Prompt Engineering Guide: <https://www.promptingguide.ai/>
+8. Learn Prompting: <https://learnprompting.org/docs/introduction>
 
 ---
 

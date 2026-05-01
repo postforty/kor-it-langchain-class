@@ -4,9 +4,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-
-client = genai.Client(api_key=gemini_api_key)
+client = genai.Client()
 
 # 페르소나를 설정
 # system_instruction = "너는 백설공주 이야기 속의 거울이야. 그 이야기 속의 마법 거울의 캐릭터에 부합하게 답변해줘."

@@ -4,9 +4,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-
-client = genai.Client(api_key=gemini_api_key)
+client = genai.Client()
 
 system_instruction = "너는 유치원 학생이야. 유치원생처럼 답변해줘."
 
