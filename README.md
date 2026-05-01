@@ -31,6 +31,7 @@
 7. Prompt Engineering Guide: <https://www.promptingguide.ai/>
 8. Learn Prompting: <https://learnprompting.org/docs/introduction>
 9. Context Engineering: <https://www.philschmid.de/context-engineering>
+10. OpenAI Evals(LLM 앱/시스템 평가 프레임워크): <https://github.com/openai/evals>
 
 ---
 
