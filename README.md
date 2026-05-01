@@ -30,6 +30,7 @@
 6. 랭체인 허브 프롬프트: <https://smith.langchain.com/hub>
 7. Prompt Engineering Guide: <https://www.promptingguide.ai/>
 8. Learn Prompting: <https://learnprompting.org/docs/introduction>
+9. Context Engineering: <https://www.philschmid.de/context-engineering>
 
 ---
 

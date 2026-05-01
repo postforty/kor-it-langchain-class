@@ -1,0 +1,5 @@
+_type: "prompt"
+template: |
+  다음 글의 핵심 내용을 세 가지 불렛 포인트로 요약해 주세요. 반드시 한국어로 답변하세요:
+  {text}
+input_variables: ["text"]

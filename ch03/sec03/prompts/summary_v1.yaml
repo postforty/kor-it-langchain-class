@@ -1,0 +1,5 @@
+_type: "prompt"
+template: |
+  다음 문장을 한 문장으로 요약해 주세요:
+  {text}
+input_variables: ["text"]
