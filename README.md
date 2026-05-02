@@ -26,12 +26,11 @@
 2. 수하스 파이, *실무로 통하는 LLM 애플리케이션 설계*, 박조은 역. 한빛미디어, 2025.
 3. LangChain Academy: <https://academy.langchain.com/courses/intro-to-langgraph>
 4. Gemini API Cookbook: <https://github.com/google-gemini/cookbook>
-5. Anthropic 프롬프트 엔지니어링: <https://docs.anthropic.com/ko/docs/build-with-claude/prompt-engineering/overview>
-6. 랭체인 허브 프롬프트: <https://smith.langchain.com/hub>
-7. Prompt Engineering Guide: <https://www.promptingguide.ai/>
-8. Learn Prompting: <https://learnprompting.org/docs/introduction>
-9. Context Engineering: <https://www.philschmid.de/context-engineering>
-10. OpenAI Evals(LLM 앱/시스템 평가 프레임워크): <https://github.com/openai/evals>
+5. 랭체인 허브 프롬프트: <https://smith.langchain.com/hub>
+6. Prompt Engineering Guide: <https://www.promptingguide.ai/>
+7. Learn Prompting: <https://learnprompting.org/docs/introduction>
+8. Context Engineering: <https://www.philschmid.de/context-engineering>
+9. OpenAI Evals(LLM 앱/시스템 평가 프레임워크): <https://github.com/openai/evals>
 
 ---
 
