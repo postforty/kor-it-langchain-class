@@ -1,0 +1,36 @@
+services:
+  ollama:
+    image: ollama/ollama
+    restart: always
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - ollama_pgvector_net
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - C:/docker_data/ollama_models:/root/.ollama
+
+  pgvector-db:
+    image: pgvector/pgvector:pg17-trixie
+    restart: always
+    container_name: pgvector-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=langchain
+      - POSTGRES_PASSWORD=langchain
+      - POSTGRES_DB=vector_db
+    volumes:
+      - C:/docker_data/pgvector_data:/var/lib/postgresql/data
+    networks:
+      - ollama_pgvector_net
+
+networks:
+  ollama_pgvector_net:
+    driver: bridge
+
+volumes:
+  pgvector_data:
+  ollama_models:

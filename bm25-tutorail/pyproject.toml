@@ -1,0 +1,15 @@
+[project]
+name = "bm25-tutorail"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "duckduckgo-search>=8.1.1",
+    "faiss-cpu>=1.13.2",
+    "kiwipiepy>=0.23.1",
+    "langchain>=1.2.17",
+    "langchain-community>=0.4.1",
+    "langchain-ollama>=1.1.0",
+    "rank-bm25>=0.2.2",
+]
