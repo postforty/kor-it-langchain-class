@@ -68,7 +68,8 @@ def create_chain():
         )
 
     llm = init_chat_model(
-        "google_genai:gemini-2.5-flash-lite",
+        # "google_genai:gemini-2.5-flash-lite",
+        "google_genai:gemini-3.1-flash-lite",
         # google_api_key=gemini_api_key
     )
 
