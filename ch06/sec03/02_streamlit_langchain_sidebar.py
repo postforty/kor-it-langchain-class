@@ -36,7 +36,7 @@ def search_documents(query: str) -> str:
 
     return "\n\n".join([doc.page_content for doc in docs])
 
-st.title("나만의 LangChain 챗봇 만들기")
+st.title("📖테크노빌드 가이드 챗봇")
 
 if "messages" not in st.session_state:
     # 세션 상태에는 LangChain 메시지 객체(HumanMessage, AIMessage)들이 저장됩니다.
@@ -67,13 +67,13 @@ def add_message(role, message):
 def create_chain():
     system_prompt = """당신은 테크노빌드 주식회사 가이드북 정보를 친절하게 제공하는 어시스턴트입니다.
 
-1. 정보가 필요할 경우 반드시 검색 도구를 사용하여 확인하세요.
+1. 정보 확인이 필요하면 'search_documents' 도구를 호출하세요.
 2. 답변은 반드시 검색된 문서의 내용에만 기반하여 작성하세요.
 3. 문서에 관련 내용이 없다면 억지로 꾸며내지 말고 모른다고 답변하세요.
 """
 
     agent = create_agent(
-        model="google_genai:gemini-2.5-flash-lite",
+        model="google_genai:gemini-3.1-flash-lite",
         tools=[search_documents],
         system_prompt=system_prompt,
     )
