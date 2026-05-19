@@ -57,27 +57,82 @@ sequenceDiagram
 uv add fastmcp
 ```
 
-### 2. MCP 서버 구동
+### 2. MCP 서버 구동 및 전송 방식(Transport) 비교
 
-```bash
-# MCP 서버 코드에서 `mcp.run(transport="streamable-http")`를 호출하는 경우
-uv run <python_file_name>
+MCP 서버는 클라이언트와의 통신을 위해 두 가지 주요 전송(Transport) 방식을 지원합니다.
 
-# MCP 서버 코드에서 `mcp.run(transport="streamable-http")`를 호출하지 않는 경우
-fastmcp run <python_file_name>
-```
+#### 1) 전송 방식별 구동 방법
+
+##### (1) stdio (표준 입출력) 방식
+로컬 환경의 클라이언트(예: Claude Desktop, Cursor 등)가 백그라운드에서 서버 프로세스를 직접 구동하고 표준 입력(stdin)과 표준 출력(stdout)을 연결하여 통신하는 방식입니다.
+
+* **CLI 명령어 실행**
+  ```bash
+  uv run fastmcp run mcp_server.py:mcp
+  ```
+* **Python 코드 실행 (`if __name__ == "__main__":` 블록)**
+  ```python
+  if __name__ == "__main__":
+      # 기본값이 stdio이므로 인수 없이 실행하거나 transport="stdio" 지정
+      mcp.run(transport="stdio")
+  ```
+  실행: `uv run mcp_server.py`
+
+##### (2) HTTP (SSE - Server-Sent Events) 방식
+서버를 상시 실행하여 웹 API 형태로 특정 포트를 대기시키고, 외부나 원격의 클라이언트가 HTTP를 통해 접속할 수 있게 하는 방식입니다.
+
+* **CLI 명령어 실행**
+  ```bash
+  uv run fastmcp run mcp_server.py:mcp --transport http --port 8000
+  ```
+* **Python 코드 실행 (`if __name__ == "__main__":` 블록)**
+  ```python
+  if __name__ == "__main__":
+      mcp.run(transport="sse", port=8000)
+  ```
+  실행: `uv run mcp_server.py`
+
+---
+
+#### 2) 전송 방식 비교 및 성능 분석
+
+| 비교 항목 | stdio (표준 입출력) 방식 | HTTP (SSE) 방식 |
+| :--- | :--- | :--- |
+| **통신 방식** | 프로세스 간 통신 (IPC - 로컬 파이프 스트림) | TCP/IP 네트워크 통신 (HTTP/SSE) |
+| **프로세스 관리** | **자동 관리 (Keep-Alive)**<br>클라이언트 실행 시 백그라운드에 최초 1회 자동으로 켜고, 종료 시 함께 꺼짐. | **수동 관리**<br>사용자나 시스템이 별도로 웹 서버를 구동하여 상시 가동(24시간 켜둠)해야 함. |
+| **속도 (Latency)** | **매우 빠름**<br>네트워크 카드나 TCP 핸드셰이크를 거치지 않아 지연 시간이 극도로 짧음. | **상대적으로 느림**<br>로컬 루프백 혹은 네트워크 계층을 거치며 HTTP 헤더 오버헤드가 발생함. |
+| **보안성** | **매우 높음**<br>로컬 시스템 내에서만 통신하여 외부 네트워크 노출이 전혀 없음. | **추가 보안 필요**<br>포트가 외부망에 노출되므로 인증 및 암호화(HTTPS) 처리가 필요함. |
+| **주요 용도** | 개인 PC에서 Claude Desktop, IDE 등과 로컬 연동할 때 (기본값) | 사내 공용 도구 서버, 클라우드 환경 등 원격에서 다수의 클라이언트가 접속할 때 |
+
+> [!TIP]
+> **로컬 개발 및 개인용 AI 앱 연동 시**에는 성능(지연 시간)이 가장 빠르고 별도의 서버 관리 오버헤드가 없는 **`stdio` 방식이 가장 나은 선택**입니다.
 
 ### 3. MCP Inspector (MCP Server 테스트)
 
 #### 1) 구동 방법
 
-> 공식 문서: <https://modelcontextprotocol.io/docs/tools/inspector>
+MCP 서버를 간편하게 시뮬레이션하고 테스트할 수 있도록 웹 브라우저 기반의 인스펙터(Inspector) UI를 띄우는 두 가지 방법이 있습니다.
 
-```bash
-npx @modelcontextprotocol/inspector
-```
+##### (1) FastMCP 내장 Inspector (권장 - stdio 기반)
+FastMCP 프레임워크가 제공하는 개발 전용 기능으로, 별도의 서버 실행 과정 없이 파일과 인스턴스 지정만으로 백그라운드 서버 구동 및 인스펙터 브라우저 연결을 동시에 자동 수행합니다.
 
-#### 2) 설정 및 사용법
+* **실행 명령어**
+  ```bash
+  uv run fastmcp dev inspector mcp_server.py:mcp
+  ```
+  *실행 시 브라우저에서 자동으로 인스펙터 웹 페이지가 열리며, 로컬의 stdio 방식으로 연동됩니다.*
+
+##### (2) 공식 npx Inspector (HTTP/SSE 기반)
+Model Context Protocol 공식 진영에서 배포한 범용 인스펙터 툴입니다. 이미 구동 중인 로컬 또는 원격지의 HTTP/SSE 서버가 존재할 때 연결하여 테스트하는 방식입니다.
+
+* **공식 문서**: <https://modelcontextprotocol.io/docs/tools/inspector>
+* **실행 명령어**
+  ```bash
+  npx @modelcontextprotocol/inspector
+  ```
+  *명령어 실행 후 터미널에 나타나는 주소로 접속한 뒤, 아래의 수동 설정 과정을 통해 연결을 시도해야 합니다.*
+
+#### 2) 설정 및 사용법 (공식 npx Inspector 사용 시)
 
 1. 첫 화면에서 주요 설정
 
