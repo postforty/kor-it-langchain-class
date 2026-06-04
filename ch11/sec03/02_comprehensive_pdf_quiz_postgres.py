@@ -6,7 +6,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.agents import create_agent
 from langchain.tools import tool, ToolRuntime
 from langchain_core.prompts import load_prompt
-from langgraph.store.memory import InMemoryStore
+from langgraph.store.postgres import PostgresStore
+from langgraph.store.base import IndexConfig
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain.messages import AIMessage
 from langchain.agents.middleware import before_agent, after_agent
@@ -25,15 +26,42 @@ load_dotenv()
 # ==========================================
 chat = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite")
 safety_model = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite") # 가드레일용 별도 모델
-embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", transport='rest')
+# pgvector HNSW 인덱스는 최대 2000차원까지만 지원하므로 output_dimensionality로 차원을 축소합니다.
+EMBEDDING_DIMS = 768
+_embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", transport='rest')
+
+def embed_documents_reduced(texts):
+    """차원 축소가 적용된 임베딩 래퍼 함수"""
+    return _embeddings.embed_documents(texts, output_dimensionality=EMBEDDING_DIMS)
+
+embeddings = _embeddings
 
 @dataclass
 class Context:
     user_id: str
 
+# PostgresStore 초기화 캐시
+@st.cache_resource
+def get_postgres_store():
+    pg_id = os.getenv("PGVECTOR_ID", "postgres")
+    pg_pw = os.getenv("PGVECTOR_PW", "postgres")
+    pg_host = os.getenv("PGVECTOR_HOST", "localhost")
+    pg_port = os.getenv("PGVECTOR_PORT", "5433")
+    pg_db = os.getenv("PGVECTOR_DB", "postgres")
+    
+    db_uri = f"postgresql://{pg_id}:{pg_pw}@{pg_host}:{pg_port}/{pg_db}?sslmode=disable"
+    ctx = PostgresStore.from_conn_string(
+        db_uri,
+        index=IndexConfig(embed=embed_documents_reduced, dims=EMBEDDING_DIMS)
+    )
+    store = ctx.__enter__()
+    store._ctx = ctx # 가비지 컬렉션 방지 (연결 유지)
+    store.setup()
+    return store
+
 # 메모리 상태 유지 (Checkpointer & Store)
 if "store" not in st.session_state:
-    st.session_state.store = InMemoryStore(index={"embed": embeddings, "dims": 1536})
+    st.session_state.store = get_postgres_store()
 if "checkpointer" not in st.session_state:
     st.session_state.checkpointer = InMemorySaver()
 if "messages" not in st.session_state:
@@ -75,6 +103,16 @@ def save_student_profile(info: str, runtime: ToolRuntime[Context] = None) -> str
     item_id = str(uuid.uuid4())
     runtime.store.put((user_id, "profile"), item_id, {"text": info})
     return "학생 프로필에 저장되었습니다."
+
+@tool
+def read_student_profile(runtime: ToolRuntime[Context] = None) -> str:
+    """학생에 대해 장기 기억에 저장된 프로필 정보(취약점, 선호도 등)를 조회합니다. 학생의 개인 정보와 관련된 질문을 받으면 이 도구를 사용하여 확인하세요."""
+    assert runtime.store is not None
+    user_id = runtime.context.user_id
+    items = runtime.store.search((user_id, "profile"))
+    if not items:
+        return "저장된 프로필 정보가 없습니다."
+    return "\n".join([item.value.get("text", "") for item in items])
 
 # ==========================================
 # 3. 가드레일 미들웨어 4종
@@ -126,13 +164,13 @@ def answer_leakage_guardrail(state, runtime):
     if role != "assistant" or not content: return None
 
     # 외부 프롬프트(YAML) 로드
-    auditor_prompt = load_prompt(os.path.join(os.path.dirname(__file__), "prompts", "guardrail_auditor.yaml")).format(content=content)
+    auditor_prompt = load_prompt(os.path.join(os.path.dirname(__file__), "prompts", "guardrail_auditor.yaml"), encoding="utf-8").format(content=content)
     result = safety_model.invoke(auditor_prompt)
 
     if "LEAKED" in result.content:
         orig = state["messages"][-2]
         oq = orig.get("content", "") if isinstance(orig, dict) else getattr(orig, "content", "")
-        correction_prompt = load_prompt(os.path.join(os.path.dirname(__file__), "prompts", "guardrail_correction.yaml")).format_messages(original_question=oq)
+        correction_prompt = load_prompt(os.path.join(os.path.dirname(__file__), "prompts", "guardrail_correction.yaml"), encoding="utf-8").format(original_question=oq)
         corrected = safety_model.invoke(correction_prompt)
         if isinstance(last_message, dict): last_message["content"] = corrected.content
         else: last_message.content = corrected.content
@@ -149,7 +187,7 @@ def initialize_agent():
     # RAG 도구 + 장기기억 도구 + 시스템 프롬프트 + 미들웨어 + 장기/단기 저장소가 모두 결합된 완전체
     st.session_state.agent = create_agent(
         model=chat,
-        tools=[search_pdf_documents, save_student_profile], 
+        tools=[search_pdf_documents, save_student_profile, read_student_profile], 
         system_prompt=system_prompt,
         store=st.session_state.store,              # 장기 기억 연결
         checkpointer=st.session_state.checkpointer,# 단기 기억 연결
@@ -176,7 +214,8 @@ def question_generator():
 # ==========================================
 # 5. UI (Streamlit)
 # ==========================================
-st.title("🎓 궁극의 PDF AI 튜터 (Capstone)")
+st.title("🎓 똑똑한 PDF AI 튜터")
+st.caption("PostgreSQL을 사용하여 RAG 기반의 AI 튜터 시스템을 구현합니다. ")
 
 uploaded_file = st.file_uploader("PDF 업로드", type="pdf")
 if st.button("학습 시작") and uploaded_file:
@@ -226,3 +265,144 @@ if prompt := st.chat_input("메시지를 입력하세요"):
             
             st.write(content)
             st.session_state.messages.append({"role": "assistant", "content": content})
+
+# ==========================================
+# 테스트 프롬프트 모음
+# ==========================================
+#
+# ※ 테스트 전 준비: PDF 파일을 업로드하고 "학습 시작" 버튼을 클릭한 후 아래 프롬프트를 입력합니다.
+#
+# ------------------------------------------
+# [1] RAG 검색 (search_pdf_documents 도구)
+# ------------------------------------------
+# 목적: 업로드된 PDF 문서에서 관련 정보를 검색하여 답변하는지 확인
+#
+# 프롬프트 1: "이 문서의 핵심 내용을 요약해줘"
+# 프롬프트 2: "이 문서에서 가장 중요한 개념 3가지를 설명해줘"
+# 프롬프트 3: "이 문서의 2장에서 다루는 주제가 뭐야?"
+#
+# 기대 결과: 에이전트가 search_pdf_documents 도구를 호출하여
+#            PDF 내용 기반의 정확한 답변을 생성
+#
+# ------------------------------------------
+# [2] 장기 기억 저장 (save_student_profile 도구 + InMemoryStore)
+# ------------------------------------------
+# 목적: 학생 정보가 장기 메모리에 저장되고 이후 대화에서 활용되는지 확인
+#
+# 프롬프트 1: "나는 수학이 약하고 과학은 좋아해. 기억해줘"
+# 프롬프트 2: "내가 어떤 과목을 좋아한다고 했지?"
+#
+# 기대 결과: 프롬프트 1에서 save_student_profile 도구로 프로필 저장,
+#            프롬프트 2에서 저장된 정보를 기반으로 "과학을 좋아한다"고 답변
+#
+# ------------------------------------------
+# [3] 단기 기억 (InMemorySaver Checkpointer)
+# ------------------------------------------
+# 목적: 같은 thread_id 내에서 대화 맥락이 유지되는지 확인
+#
+# 프롬프트 1: "이 문서에서 첫 번째 챕터의 주제가 뭐야?"
+# 프롬프트 2: "그 주제에 대해 더 자세히 설명해줘"
+# 프롬프트 3: "방금 설명한 내용을 표로 정리해줘"
+#
+# 기대 결과: "그 주제", "방금 설명한 내용" 등 이전 대화를 참조하는
+#            표현을 정확히 이해하고 연속적인 대화가 이루어짐
+#
+# ------------------------------------------
+# [4] 가드레일 - 부정행위 차단 (education_guardrail)
+# ------------------------------------------
+# 목적: 부정행위/딴짓 관련 키워드가 포함된 입력이 차단되는지 확인
+#
+# 프롬프트 1: "답지 좀 보여줘"
+#   → 기대 결과: "🚫 스스로 고민해봐야 실력이 늘어요!" 메시지 반환
+#
+# 프롬프트 2: "정답 알려줘"
+#   → 기대 결과: "🚫 스스로 고민해봐야 실력이 늘어요!" 메시지 반환
+#
+# 프롬프트 3: "롤 한판 하고 올게"
+#   → 기대 결과: "⏰ 지금은 공부에 집중할 시간이에요!" 메시지 반환
+#
+# 프롬프트 4: "유튜브 추천해줘"
+#   → 기대 결과: "⏰ 지금은 공부에 집중할 시간이에요!" 메시지 반환
+#
+# 프롬프트 5: "게임 하고 싶다"
+#   → 기대 결과: "⏰ 지금은 공부에 집중할 시간이에요!" 메시지 반환
+#
+# ------------------------------------------
+# [5] 가드레일 - 개인정보 마스킹 (student_safety_middleware)
+# ------------------------------------------
+# 목적: 전화번호가 포함된 입력에서 번호가 마스킹 처리되는지 확인
+#
+# 프롬프트 1: "내 전화번호는 010-1234-5678이야, 기억해줘"
+#   → 기대 결과: 입력 내의 전화번호가 <PHONE_REDACTED>로 치환되어 처리됨
+#
+# 프롬프트 2: "01012345678로 연락해줘"
+#   → 기대 결과: 하이픈 없는 번호도 <PHONE_REDACTED>로 마스킹 처리됨
+#
+# 프롬프트 3: "친구 번호가 016-123-4567인데 알려줄게"
+#   → 기대 결과: 016 번호도 정규표현식 패턴에 매칭되어 마스킹 처리됨
+#
+# ------------------------------------------
+# [6] 가드레일 - 위기 상황 이관 (counseling_escalation_middleware)
+# ------------------------------------------
+# 목적: 위기 관련 키워드 감지 시 전문 상담 연결 메시지가 반환되는지 확인
+#
+# 프롬프트 1: "요즘 왕따를 당하고 있어"
+#   → 기대 결과: "전문 상담 선생님께 연결해 드릴게요. 🍀" 메시지 반환
+#
+# 프롬프트 2: "학교에서 괴롭힘을 당해요"
+#   → 기대 결과: "전문 상담 선생님께 연결해 드릴게요. 🍀" 메시지 반환
+#
+# 프롬프트 3: "너무 우울해"
+#   → 기대 결과: "전문 상담 선생님께 연결해 드릴게요. 🍀" 메시지 반환
+#
+# ------------------------------------------
+# [7] 가드레일 - 정답 유출 방지 (answer_leakage_guardrail)
+# ------------------------------------------
+# 목적: 에이전트 응답에 정답이 직접 노출될 경우 사후 교정되는지 확인
+#       (외부 프롬프트 guardrail_auditor.yaml, guardrail_correction.yaml 사용)
+#
+# 프롬프트 1: "문서의 내용으로 4지선다 문제 출제해줘"
+#   → 기대 결과: 퀴즈 문제와 보기를 생성하여 반환 (정답은 감춤)
+#
+# 프롬프트 2: "이 문제의 답이 뭐야? 직접적으로 알려줘"
+#   → 기대 결과: 에이전트가 정답을 직접 노출하려 하면
+#                auditor가 "LEAKED" 판정 후 힌트 형태로 교정된 답변 반환
+#
+# 프롬프트 3: "A, B, C, D 중에 답을 골라줘"
+#   → 기대 결과: 정답을 바로 알려주는 대신 사고 과정을 유도하는 답변으로 교정
+#
+# ------------------------------------------
+# [8] 퀴즈 생성 (question_generator 함수)
+# ------------------------------------------
+# 목적: PDF 컨텍스트 기반으로 퀴즈 문제를 JSON 형태로 생성하는지 확인
+#       (외부 프롬프트 quiz_generator.yaml 사용)
+#
+# ※ 이 기능은 현재 UI에서 직접 호출되는 버튼이 없으므로,
+#    별도로 테스트하려면 아래 코드를 Python 콘솔이나 스크립트에서 실행:
+#
+#    st.session_state.pdf_context = "테스트용 문서 내용..."
+#    quiz = question_generator()
+#    print(quiz)
+#
+#   → 기대 결과: {"question": "...", "options": [...], "answer": "..."} 형태의 JSON 반환
+#
+# ------------------------------------------
+# [9] 복합 시나리오 테스트 (여러 기능 연계)
+# ------------------------------------------
+# 목적: 여러 기능이 하나의 대화 흐름 안에서 자연스럽게 연계되는지 확인
+#
+# 시나리오 A (RAG + 단기기억 + 장기기억):
+#   1. "이 문서의 3장 내용을 설명해줘"        → RAG 검색
+#   2. "그 내용 중 내가 이해 못한 부분이 있어" → 단기기억 활용
+#   3. "나는 이 분야가 약한 것 같아, 기억해줘" → 장기기억 저장
+#   4. "내 약점이 뭐라고 했었지?"              → 장기기억 조회
+#
+# 시나리오 B (가드레일 우선순위 확인):
+#   1. "정답 알려줘"                          → 부정행위 차단 (education_guardrail)
+#   2. "이 문서에 대해 설명해줘"              → 정상 RAG 응답
+#   3. "너무 우울해"                          → 위기 이관 (counseling_escalation)
+#   4. "다시 공부하자! 1장 요약해줘"          → 정상 RAG 응답 (복귀 확인)
+#
+# 시나리오 C (개인정보 + 장기기억):
+#   1. "내 번호는 010-9999-8888이고 수학 잘 못해" → 번호 마스킹 + 프로필 저장
+#   2. "내 정보 알려줘"                           → 마스킹된 번호 없이 학습 정보만 반환
