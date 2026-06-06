@@ -117,7 +117,7 @@ def search_user_memories(
 
 
 def main():
-    model = init_chat_model("google_genai:gemini-3.1-flash-lite")
+    model = init_chat_model("google_genai:gemini-3.5-flash") # 모델에 따라 장기기억에 꼭 필요한 데이터를 저장하지 못하기도 함
     checkpointer = InMemorySaver()
 
     # .env에 정의된 접속 정보를 가져와 DB_URI 동적 생성
