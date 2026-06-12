@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "ddgs>=9.14.4",
     "geopy>=2.4.1",
     "ipykernel>=6.30.1",
     "jupyter>=1.1.1",
@@ -15,5 +16,6 @@ dependencies = [
     "langchain-ollama>=1.0.1",
     "langchain-postgres>=0.0.17",
     "langgraph>=1.0.9",
+    "langgraph-supervisor>=0.0.31",
     "pypdf>=6.7.1",
 ]
